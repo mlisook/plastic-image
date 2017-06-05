@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>plastic-image demo</title>
+
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+    <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+    <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+    <link rel="import" href="../plastic-image.html">
+
+    <custom-style>
+      <style is="custom-style" include="demo-pages-shared-styles">
+      </style>
+    </custom-style>
+  </head>
+  <body>
+    <div class="vertical-section-container centered">
+      <h3>Basic plastic-image demo</h3>
+      <demo-snippet>
+        <template>
+          <plastic-image id="i1" delay-load preload fade placeholder="images/7-6x6.png"
+            sizing="contain"
+            srcset="images/20130403_132154-300x225.jpg 300w, images/20130403_132154-768x576.jpg 768w"
+            style="height: 200px; width: 300px;"></plastic-image>
+          <br>
+          <plastic-image id="i2" preload fade lazy-load placeholder="images/7-6x6.png"
+            sizing="contain"
+            srcset="images/20130403_132154-300x225.jpg 300w, images/20130403_132154-768x576.jpg 768w"
+            style="height: 200px; width: 300px;" use-element-dim></plastic-image>  
+             <br>
+          <plastic-image id="i3" preload fade lazy-load placeholder="images/7-6x6.png"
+            sizing="contain"
+            srcset="images/20130403_132154-300x225.jpg 300w, images/20130403_132154-768x576.jpg 768w, images/20130403_132154-1024x768.jpg 1024w 2.0x"
+            style="height: 200px; width: 300px;"></plastic-image>  
+                <br>
+          <plastic-image id="i3" preload fade lazy-load placeholder="images/7-6x6.png"
+            sizing="contain"
+            srcset="images/20130403_132154-300x225.jpg 300w, images/20130403_132154-768x576.jpg 768w 1.0x, images/20130403_132154-1024x768.jpg 1024w 2.0x"
+            style="height: 200px; width: 300px;"></plastic-image>  
+        </template>
+      </demo-snippet>
+    </div>
+  </body>
+</html>
