@@ -1,0 +1,491 @@
+<!--
+@license MIT
+-->
+
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../resize-aware/resize-aware.html" />
+<link rel="import" href="../iron-image/iron-image.html" />
+<link rel="import" href="../iron-jsonp-library/iron-jsonp-library.html" />
+
+<!--
+`plastic-image` is a Polymer 2.0 element which adds extra plasticity to \<iron-image\> with support for srcset
+and lazy loading.
+
+`plastic-image` extends `iron-image` by adding a `srcset` attribute for client side image
+size selection and `lazy-load` for loading the image only when it has scrolled into the 
+viewport.
+
+Please review the documentation for `iron-image` as it applies to this element  also.
+
+plastic-image srcset 
+
+The `srcset` attribute is a string consisting of one or more image selection strings separated by commas. 
+Each image selection string is composed of:
+
+1. A url to an image
+2. One or _more_ descriptors
+  - width descriptor: a positive integer directly followed by 'w'. e.g. `700w`
+  - height descriptor: a positive integer directly followed by 'h'. e.g. `345h`
+  - pixel density descriptor: a positive floating point number directly followed by 'x'. e.g. `2.0x`
+
+`plastic-image` extends the `<img srcset="...">` feature by allowing multiple descriptors for an image
+and mixed descriptors in a single srcset.
+
+`plastic-image` also extends srcset use by optionally allowing image selection to be based on the render size of
+the `plastic-image` control instead of the viewport, which is the standard.  To use this optional function 
+include the `use-element-dim` attribute.
+
+Example srcset
+
+srcset="foo-s.jpg 150w, foo-sh.jpg 150w 2.0x, foo-m.jpg 405w, foo-mh 2.0x 405w, foo-l 1024w, foo-t 500w 750h"
+
+Examples:
+Use the control as you would an `iron-image` but with the srcset.
+
+<plastic-image preload fade sizing="contain"
+  srcset="images/foo-s.jpg 150w, images/foo-sh.jpg 150w 2.0x, images/foo-m.jpg 405w, 
+  images/foo-mh 2.0x 405w, images/foo-l 1024w, images/foo-t 500w 750h"
+  placeholder="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAYAAADgzO9IAAAAmElEQVQImWNmYGBgSExMzBATE7dSVFT8eO/evTcMDAwMjIFe5iYSIjybL136cunNW56FulIaEoJcfBdY5GWjvJ4/+SJhIcUhwavI5SbIxR+YvzRqH8unx7/Osf8VYpAVEWLgZuO8ljrfbwMDAwMD07u/j/ZYun5f9JfjSfGnHx9dGaCAJcBimwXjZ4Z+HllGn0XbXr+ASQAAi5UxQq88/fsAAAAASUVORK5CYII="></plastic-image>
+
+To base image selection on the rendered size of the control add the `use-element-dim` attribute.
+
+<plastic-image preload fade sizing="contain" use-element-dim
+  srcset="images/foo-s.jpg 150w, images/foo-sh.jpg 150w 2.0x, images/foo-m.jpg 405w, 
+  images/foo-mh 2.0x 405w, images/foo-l 1024w, images/foo-t 500w 750h"
+  placeholder="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAYAAADgzO9IAAAAmElEQVQImWNmYGBgSExMzBATE7dSVFT8eO/evTcMDAwMjIFe5iYSIjybL136cunNW56FulIaEoJcfBdY5GWjvJ4/+SJhIcUhwavI5SbIxR+YvzRqH8unx7/Osf8VYpAVEWLgZuO8ljrfbwMDAwMD07u/j/ZYun5f9JfjSfGnHx9dGaCAJcBimwXjZ4Z+HllGn0XbXr+ASQAAi5UxQq88/fsAAAAASUVORK5CYII="></plastic-image>
+
+Lazy Loading
+
+Add the attribute `lazy-load` to the element and image loading will be delayed until the element
+is in the viewport.
+
+<plastic-image lazy-load preload fade sizing="contain" 
+  srcset="images/foo-s.jpg 150w, images/foo-sh.jpg 150w 2.0x, images/foo-m.jpg 405w, 
+  images/foo-mh 2.0x 405w, images/foo-l 1024w, images/foo-t 500w 750h"
+  placeholder="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAYAAADgzO9IAAAAmElEQVQImWNmYGBgSExMzBATE7dSVFT8eO/evTcMDAwMjIFe5iYSIjybL136cunNW56FulIaEoJcfBdY5GWjvJ4/+SJhIcUhwavI5SbIxR+YvzRqH8unx7/Osf8VYpAVEWLgZuO8ljrfbwMDAwMD07u/j/ZYun5f9JfjSfGnHx9dGaCAJcBimwXjZ4Z+HllGn0XbXr+ASQAAi5UxQq88/fsAAAAASUVORK5CYII="></plastic-image>
+
+Standard iron-image properties that should not be used
+
+Do not use `preventLoad` / `prevent-load`.  This is used internally by `plastic-image` to allow the srcset processing step.
+To achieve that function use `delayLoad` / `delay-load` instead.
+
+Do not use `src`.  That will be overwritten by the srcset evaluation.  To specify a fallback image use
+the `fallbackSrc` / `fallback-src` attribute instead.
+
+
+@element plastic-image
+@demo demo/index.html
+-->
+
+<dom-module id="plastic-image">
+    <!--    
+  <template>
+    <style>
+       :host {
+        display: block;
+      }
+
+      resize-aware {
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+
+   
+
+    <resize-aware on-element-size-changed="_sizeChanged">
+      <iron-image placeholder="[[placeholder]]" style="width: 100%; height:200px;" sizing="cover" fade preload src="[[_selectedImgUrl]]"></iron-image>
+    </resize-aware>
+
+  </template>
+-->
+    <script>
+        /**
+         * `plastic-image`
+         * iron-image wrapper supporting srcset
+         *
+         * @customElement
+         * @polymer
+         * @demo demo/index.html
+         */
+        class PlasticImage extends customElements.get('iron-image') {
+            static get is() {
+                return 'plastic-image';
+            }
+            static get properties() {
+                return {
+                    /**
+                     * a srcset string providing rules for
+                     * which image to select
+                     */
+                    srcset: {
+                        type: String
+                    },
+                    /**
+                     * The image url selected from srcset rules
+                     */
+                    _selectedImgUrl: {
+                        type: String,
+                        notify: true
+                    },
+                    /**
+                     * While true, the control refrains from
+                     * evaluating the srcset. Set in the markup
+                     * as delay-load and when you are ready set
+                     * the property value to false.
+                     * 
+                     * For example you may be retrieving the srcset
+                     * from an ajax call. You would set this to true
+                     * in the markup and set it to false once the data
+                     * is available.
+                     */
+                    delayLoad: {
+                        type: Boolean,
+                        value: false,
+                        notify: true,
+                        reflectToAttribute: true
+                    },
+                    /**
+                     * When true, the dimensions of this control
+                     * are used instead of the viewport size to
+                     * make the image selection from the srcset expression.
+                     */
+                    useElementDim: {
+                        type: Boolean,
+                        reflectToAttribute: true,
+                        value: false
+                    },
+                    /**
+                     * This is not really needed as long as there
+                     * is at least 1 image selection spec in the
+                     * srcset.  However, specifying this value
+                     * makes explicit an alternative that has no
+                     * dimensional or density spec.
+                     */
+                    fallbackSrc: {
+                        type: String,
+                        reflectToAttribute: true
+                    },
+                    /**
+                     * Indicates if the image should only be loaded
+                     * when it is scrolled into view
+                     */
+                    lazyLoad: {
+                        type: Boolean,
+                        value: false
+                    },
+                    _lazyLoadPending: {
+                        type: Boolean,
+                        value: true
+                    }
+                };
+            }
+
+            static get observers() {
+                return [
+                    '_doImageSelectionObserver(fallbackSrc, srcset, delayLoad, _lazyLoadPending)'
+                ]
+            }
+
+            /**
+             * Adds code to the template to load a polyfill 
+             * for IntersectionObserver if the browser does 
+             * not natively support it.
+             */
+            static get template() {
+                if (!window.plasticImageTemplate) {
+                    // create a clone of iron-image template
+                    window.plasticImageTemplate = customElements.get('iron-image').template.cloneNode(true);
+                    // check for support of IntersectionObserver
+                    if (!('IntersectionObserver' in window)) {
+                        let ijpl = document.createElement('iron-jsonp-library');
+                        ijpl.id = "ijplIntersectionObserver";
+                        ijpl.setAttribute('notify-event', "intersection-observer-polyfill");
+                        ijpl.setAttribute('library-url',
+                            'https://polyfill.io/v2/polyfill.min.js?features=IntersectionObserver&onload=%%callback%%'
+                        );
+                        window.plasticImageTemplate.content.appendChild(ijpl);
+                    }
+
+                }
+                return window.plasticImageTemplate;
+            }
+
+
+            /**
+             * At connection, prevent iron-image from loading the image
+             */
+            connectedCallback() {
+                super.connectedCallback();
+                this.preventLoad = true;
+            }
+
+            /**
+             * When attached, parse the srcset string and pick
+             * the best image
+             */
+            attached() {
+                super.attached();
+                // if lazy loading, set up the intersection
+                // observer. Otherwise, go ahead and process
+                // the image selection
+                if (this.lazyLoad) {
+                    this._initLazyLoad();
+                } else {
+                    this._lazyLoadPending = false;
+
+                    if (!this.delayLoad) {
+                        if (this.useElementDim) {
+                            // if using the element's dimensions instead of
+                            // the viewport, wait until render so that the
+                            // element will have a clientWidth and clientHeight
+                            Polymer.RenderStatus.beforeNextRender(this, () => {
+                                this.assignImgSrc();
+                            });
+                        } else {
+                            this.assignImgSrc();
+                        }
+                    }
+                }
+            }
+
+            /**
+             * When disconnected, remove the intersectionObserver
+             * if lazy loading is in effect.
+             */
+            disconnectedCallback() {
+                super.disconnectedCallback();
+                if (this.lazyLoad && window.plasticImageIntersectionObserver) {
+                    window.plasticImageIntersectionObserver.observer.unobserve(this);
+                    window.plasticImageIntersectionObserver.counter--;
+                }
+                if (window.plasticImageIntersectionObserver.counter <= 0) {
+                    window.plasticImageIntersectionObserver.observer.disconnect();
+                    window.plasticImageIntersectionObserver = null;
+                }
+            }
+
+            /**
+             * Observer for determining if it is time for
+             * the control to set the src property in the
+             * underlying iron-image.
+             */
+            _doImageSelectionObserver(fallbackSrc, srcset, delayLoad, lazyLoadPending) {
+                if (!delayLoad && !lazyLoadPending && (srcset || fallbackSrc)) {
+                    this.assignImgSrc();
+                }
+            }
+
+            /**
+             * Assign the best image to the iron-image src property 
+             * and allow it to be loaded
+             */
+            assignImgSrc() {
+                let srcArray = this.srcset && this.srcset.length > 1 ? this.srcsetParse(this.srcset) : [];
+                this._selectedImgUrl = srcArray.length > 0 ? this.bestMatchingImage(srcArray) :
+                    this.fallbackSrc;
+                if (this._selectedImgUrl) {
+                    if (!this.src || this.src !== this._selectedImgUrl) this.src = this._selectedImgUrl;
+                    this.preventLoad = false;
+                }
+            }
+
+            /**
+             * Returns a sorted array of only the unique elements of an array
+             * @param arr {array} object array
+             */
+            deepUnique(arr) {
+                return arr.sort().filter((el, i) => {
+                    return JSON.stringify(el) !== JSON.stringify(arr[i - 1]);
+                });
+            }
+
+            /**
+             * Converts a srcset string to an array of objects
+             * with url, width, height and density properties
+             * @param str {string} a string in HTML srcset format
+             */
+            srcsetParse(str) {
+                let reInt = /^\d+$/;
+                return this.deepUnique(str.split(',').map((el) => {
+                    var ret = {
+                        url: ""
+                    };
+
+                    el.trim().split(/\s+/).forEach((el, i) => {
+                        if (i === 0) {
+                            return ret.url = el;
+                        }
+
+                        let value = el.substring(0, el.length - 1);
+                        let postfix = el[el.length - 1];
+                        let intVal = parseInt(value, 10);
+                        let floatVal = parseFloat(value);
+
+                        if (postfix === 'w' && reInt.test(value)) {
+                            ret.width = intVal;
+                        } else if (postfix === 'h' && reInt.test(value)) {
+                            ret.height = intVal;
+                        } else if (postfix === 'x' && !isNaN(floatVal)) {
+                            ret.density = floatVal;
+                        } else {
+                            throw new Error('Invalid srcset descriptor: ' + el + '.');
+                        }
+                    });
+
+                    return ret;
+                }));
+            }
+
+            /**
+             * Converts a srcset array to a srcset string
+             * @param arr {Array<Isrcset>} srcset array
+             */
+            srcsetStringify(arr) {
+                return arr.map((el) => {
+                    if (!el.url) {
+                        throw new Error('URL is required.');
+                    }
+
+                    let ret = [el.url];
+
+                    if (el.width) {
+                        ret.push(el.width + 'w');
+                    }
+
+                    if (el.height) {
+                        ret.push(el.height + 'h');
+                    }
+
+                    if (el.density) {
+                        ret.push(el.density + 'x');
+                    }
+
+                    return ret.join(' ');
+                }).join(', ');
+            }
+
+            /**
+             * Get best image from srcset
+             * @param arr {Array<Isrcset>} srcset array
+             */
+            bestMatchingImage(arr) {
+                // referance dimensions
+                let refDim = this.useElementDim ? {
+                    width: this.clientWidth || window.innerWidth || document.documentElement.clientWidth,
+                    height: this.clientHeight || window.innerHeight || document.documentElement.clientHeight,
+                    density: window.devicePixelRatio || 1.0
+                } : {
+                    width: window.innerWidth || document.documentElement.clientWidth,
+                    height: window.innerHeight || document.documentElement.clientHeight,
+                    density: window.devicePixelRatio || 1.0
+                };
+                let filtered = this.fallbackSrc ? arr.concat([{
+                    url: this.fallbackSrc
+                }]) : arr;
+                filtered = this.filterLarge(
+                    this.filterLarge(
+                        this.filterLarge(filtered, 'width', refDim.width), 'height', refDim.height),
+                    'density', refDim.density);
+                filtered = this.filterSmall(this.filterSmall(this.filterSmall(filtered, 'width'), 'height'),
+                    'density');
+
+                return filtered[0].url;
+            }
+
+            /**
+             * filter out disqualified items less than the refVal
+             */
+            filterLarge(arr, attr, refVal) {
+                if (arr.length < 2) return arr;
+                let largest = false;
+                for (let i = 0; i < arr.length; i++) {
+                    if (arr[i][attr]) {
+                        if (!largest || largest[attr] < arr[i][attr]) {
+                            largest = arr[i];
+                        }
+                    }
+                }
+                if (!largest) return arr;
+
+                let filtered = [];
+                for (let i = 0; i < arr.length; i++) {
+                    if (!arr[i][attr] || arr[i][attr] >= refVal) filtered.push(arr[i]);
+                }
+                if (filtered.length == 0) filtered.push(largest);
+
+                return filtered;
+            }
+            /**
+             * filter to the smallest items of a dimension
+             */
+            filterSmall(arr, attr) {
+                if (arr.length < 2) return arr;
+                let smallest = false;
+                for (let i = 0; i < arr.length; i++) {
+                    if (arr[i][attr]) {
+                        if (!smallest || smallest[attr] > arr[i][attr]) {
+                            smallest = arr[i];
+                        }
+                    }
+                }
+                if (!smallest) return arr;
+
+                let filtered = [];
+                for (let i = 0; i < arr.length; i++) {
+                    if (!arr[i][attr] || arr[i][attr] <= smallest[attr]) filtered.push(arr[i]);
+                }
+
+                return filtered;
+            }
+
+            /**
+             * initialize lazy loading process by 
+             * creating an intersection observer and
+             * adding this element to the observation
+             * list.
+             *
+             * Waits for the polyfill to load, if necessary
+             *
+             * All instances of plastic-image share the same 
+             * IntersectionObserver.
+             */
+            _initLazyLoad() {
+                // if the polyfill is needed and not yet loaded,
+                // wait for it to load first.
+                if (!('IntersectionObserver' in window)) {
+                    this.$.ijplIntersectionObserver.addEventListener("intersection-observer-polyfill", () => {
+                        setTimeout(() => {
+                            this._initLazyLoad();
+                        }, 300);
+                    });
+                } else {
+                    // IntersectionObserver is available, initialize observation
+                    // Create the observer for this page if it doesn't exist
+                    if (!window.plasticImageIntersectionObserver) {
+                        window.plasticImageIntersectionObserver = {
+                            counter: 0,
+                            observer: new IntersectionObserver(function (entries, observer) {
+                                for (let i = 0; i < entries.length; i++) {
+                                    entries[i].target._lazyLoadCallback(entries[i]);
+                                }
+                            }, {})
+                        };
+                    }
+                    // observe this element
+                    window.plasticImageIntersectionObserver.observer.observe(this);
+                    window.plasticImageIntersectionObserver.counter++;
+                }
+            }
+
+            _lazyLoadCallback(e) {
+                if (e.isIntersecting && this._lazyLoadPending) {
+                    this._lazyLoadPending = false;
+                }
+            }
+
+        }
+
+        window.customElements.define(PlasticImage.is, PlasticImage);
+    </script>
+</dom-module>
