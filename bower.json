@@ -2,9 +2,11 @@
   "name": "plastic-image",
   "description": "iron-image extension supporting srcset and lazy loading",
   "main": "plastic-image.html",
-  "version": "0.0..1",
+  "version": "1.0.0",
+  "license": "MIT",
   "keywords": [
     "polymer",
+    "polymer 2.0",
     "image",
     "iron-image",
     "srcset",
@@ -17,15 +19,11 @@
   ],
   "dependencies": {
     "polymer": "Polymer/polymer#^2.0.0",
-    "iron-image": "PolymerElements/iron-image#^2.1.1",
-    "iron-jsonp-library": "PolymerElements/iron-jsonp-library#^2.0.0"
+    "iron-image": "PolymerElements/iron-image#^2.1.1"
   },
   "devDependencies": {
     "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^2.0.0",
     "web-component-tester": "Polymer/web-component-tester#^6.0.0",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0"
-  },
-  "resolutions": {
-    "polymer": "^2.0.0"
   }
 }

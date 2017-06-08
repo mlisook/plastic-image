@@ -3,7 +3,6 @@
 -->
 
 <link rel="import" href="../polymer/polymer-element.html">
-<link rel="import" href="../resize-aware/resize-aware.html" />
 <link rel="import" href="../iron-image/iron-image.html" />
 <link rel="import" href="../iron-jsonp-library/iron-jsonp-library.html" />
 
@@ -188,31 +187,6 @@ the `fallbackSrc` / `fallback-src` attribute instead.
             }
 
             /**
-             * Adds code to the template to load a polyfill 
-             * for IntersectionObserver if the browser does 
-             * not natively support it.
-             */
-            static get template() {
-                if (!window.plasticImageTemplate) {
-                    // create a clone of iron-image template
-                    window.plasticImageTemplate = customElements.get('iron-image').template.cloneNode(true);
-                    // check for support of IntersectionObserver
-                    if (!('IntersectionObserver' in window)) {
-                        let ijpl = document.createElement('iron-jsonp-library');
-                        ijpl.id = "ijplIntersectionObserver";
-                        ijpl.setAttribute('notify-event', "intersection-observer-polyfill");
-                        ijpl.setAttribute('library-url',
-                            'https://polyfill.io/v2/polyfill.min.js?features=IntersectionObserver&onload=%%callback%%'
-                        );
-                        window.plasticImageTemplate.content.appendChild(ijpl);
-                    }
-
-                }
-                return window.plasticImageTemplate;
-            }
-
-
-            /**
              * At connection, prevent iron-image from loading the image
              */
             connectedCallback() {
@@ -258,10 +232,11 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                 if (this.lazyLoad && window.plasticImageIntersectionObserver) {
                     window.plasticImageIntersectionObserver.observer.unobserve(this);
                     window.plasticImageIntersectionObserver.counter--;
-                }
-                if (window.plasticImageIntersectionObserver.counter <= 0) {
-                    window.plasticImageIntersectionObserver.observer.disconnect();
-                    window.plasticImageIntersectionObserver = null;
+
+                    if (window.plasticImageIntersectionObserver.counter <= 0) {
+                        window.plasticImageIntersectionObserver.observer.disconnect();
+                        window.plasticImageIntersectionObserver = null;
+                    }
                 }
             }
 
@@ -454,7 +429,21 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                 // if the polyfill is needed and not yet loaded,
                 // wait for it to load first.
                 if (!('IntersectionObserver' in window)) {
-                    this.$.ijplIntersectionObserver.addEventListener("intersection-observer-polyfill", () => {
+                    // There could be multiple plastic-image elements in the document
+                    // but we only need to load the polyfill for IntersectionObserver
+                    // one time.
+                    let polyfillScript = document.getElementById('polyfill-IntersectionObserver');
+                    if (!polyfillScript) {
+                        polyfillScript = document.createElement("script");
+                        polyfillScript.id = 'polyfill-IntersectionObserver';
+                        polyfillScript.src =
+                            "https://polyfill.io/v2/polyfill.min.js?features=IntersectionObserver";
+                        polyfillScript.async = true;
+                        document.head.appendChild(polyfillScript);
+                    }
+                    // listen for the polyfill to finish loading
+                    // then retry the initLazyLoad process
+                    polyfillScript.addEventListener("load", () => {
                         setTimeout(() => {
                             this._initLazyLoad();
                         }, 300);
@@ -464,7 +453,9 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                     // Create the observer for this page if it doesn't exist
                     if (!window.plasticImageIntersectionObserver) {
                         window.plasticImageIntersectionObserver = {
+                            /* the number of elements sharing this observer */
                             counter: 0,
+                            /* an IntersectionObserver with only default arguments */
                             observer: new IntersectionObserver(function (entries, observer) {
                                 for (let i = 0; i < entries.length; i++) {
                                     entries[i].target._lazyLoadCallback(entries[i]);
@@ -478,6 +469,10 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                 }
             }
 
+            /**
+             * called by the intersection observer
+             * to indicate a change in intersection
+             */
             _lazyLoadCallback(e) {
                 if (e.isIntersecting && this._lazyLoadPending) {
                     this._lazyLoadPending = false;
