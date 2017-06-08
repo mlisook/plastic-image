@@ -32,6 +32,19 @@ include the `use-element-dim` attribute.
 
 `srcset="foo-s.jpg 150w, foo-sh.jpg 150w 2.0x, foo-m.jpg 405w, foo-mh 2.0x 405w, foo-l 1024w, foo-t 500w 750h"`
 
+## Lazy ... wait for it ... Loading
+
+Lazy loading delays loading the image (but not the placeholder image) until the element is at least 1px inside the viewport. 
+This can improve the perceived performance of the page by removing below the fold images from first paint. 
+
+`plastic-image` uses an `IntersectionObserver` to trigger image loads when `lazy-load` is selected. IntersectionObserver is automatically polyfilled if a feature test shows the browser does not include native support (currently IE and IOS Safari). 
+
+To use lazy loading simply add the `lazy-load` attribute to the element.
+
+```HtML
+<plastic-image preload fade lazy-load srcset="..." ... ></plastic-image>
+```
+
 ## Install the Component
 
 `bower install --save plastic-image`
@@ -46,7 +59,7 @@ Use the control as you would an `iron-image` but with the srcset.
   placeholder="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAYAAADgzO9IAAAAmElEQVQImWNmYGBgSExMzBATE7dSVFT8eO/evTcMDAwMjIFe5iYSIjybL136cunNW56FulIaEoJcfBdY5GWjvJ4/+SJhIcUhwavI5SbIxR+YvzRqH8unx7/Osf8VYpAVEWLgZuO8ljrfbwMDAwMD07u/j/ZYun5f9JfjSfGnHx9dGaCAJcBimwXjZ4Z+HllGn0XbXr+ASQAAi5UxQq88/fsAAAAASUVORK5CYII="></plastic-image>
 ```
 
-To base image selection on the rendered size of the control add the `use-element-dim` attribute.
+To base image selection on the rendered size of the control, instead of the viewport (default), add the `use-element-dim` attribute.
 
 ```HTML
 <plastic-image preload fade sizing="contain" use-element-dim
