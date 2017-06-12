@@ -344,15 +344,32 @@ the `fallbackSrc` / `fallback-src` attribute instead.
              * @param arr {Array<Isrcset>} srcset array
              */
             bestMatchingImage(arr) {
+                let densityMultiplier = 1;
+
+                // Check if denisty is provided in srcset
+                let hasDensity = false;
+                arr.forEach(function (src) {
+                    if("density" in src){
+                        hasDensity = true;
+                    }
+                });
+
+                if(!hasDensity){
+                  // When no density is set use devicePixelRatio as a multiplier for reference dimensions
+                  densityMultiplier = (window.devicePixelRatio || 1.0);
+                }
+
                 // referance dimensions
                 let refDim = this.useElementDim ? {
-                    width: this.clientWidth || window.innerWidth || document.documentElement.clientWidth,
-                    height: this.clientHeight || window.innerHeight || document.documentElement.clientHeight,
-                    density: window.devicePixelRatio || 1.0
+                    width: (this.clientWidth || window.innerWidth || document.documentElement.clientWidth) * densityMultiplier,
+                    height: (this.clientHeight || window.innerHeight || document.documentElement.clientHeight) * densityMultiplier,
+                    // When no density is provided densityMultiplier is used and density filter can be set to 1, otherwise use devicePixelRatio
+                    density: !hasDensity ? 1 : (window.devicePixelRatio || 1.0)
                 } : {
-                    width: window.innerWidth || document.documentElement.clientWidth,
-                    height: window.innerHeight || document.documentElement.clientHeight,
-                    density: window.devicePixelRatio || 1.0
+                    width: (window.innerWidth || document.documentElement.clientWidth) * densityMultiplier,
+                    height: (window.innerHeight || document.documentElement.clientHeight) * densityMultiplier,
+                    // When no density is provided densityMultiplier is used and density filter can be set to 1, otherwise use devicePixelRatio
+                    density: !hasDensity ? 1 : (window.devicePixelRatio || 1.0)
                 };
                 let filtered = this.fallbackSrc ? arr.concat([{
                     url: this.fallbackSrc
