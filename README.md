@@ -32,12 +32,17 @@ include the `use-element-dim` attribute.
 
 `srcset="foo-s.jpg 150w, foo-sh.jpg 150w 2.0x, foo-m.jpg 405w, foo-mh 2.0x 405w, foo-l 1024w, foo-t 500w 750h"`
 
+### Automatic Density
+
+If _none_ of the image selection strings includes a pixel density descriptor ('x' e.g. `4.0x`), then the image
+selection process will automatically compensate for the viewport's pixel density.
+
 ## Lazy ... wait for it ... Loading
 
 Lazy loading delays loading the image (but not the placeholder image) until the element is at least 1px inside the viewport. 
 This can improve the perceived performance of the page by removing below the fold images from first paint. 
 
-`plastic-image` uses an `IntersectionObserver` to trigger image loads when `lazy-load` is selected. IntersectionObserver is automatically polyfilled if a feature test shows the browser does not include native support (currently IE and IOS Safari). 
+`plastic-image` uses an `IntersectionObserver` to trigger image loads when `lazy-load` is selected. IntersectionObserver is automatically polyfilled if a feature test shows the browser does not include native support. 
 
 To use lazy loading simply add the `lazy-load` attribute to the element.
 
@@ -65,6 +70,15 @@ To base image selection on the rendered size of the control, instead of the view
 <plastic-image preload fade sizing="contain" use-element-dim
   srcset="images/foo-s.jpg 150w, images/foo-sh.jpg 150w 2.0x, images/foo-m.jpg 405w, 
   images/foo-mh 2.0x 405w, images/foo-l 1024w, images/foo-t 500w 750h"
+  placeholder="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAYAAADgzO9IAAAAmElEQVQImWNmYGBgSExMzBATE7dSVFT8eO/evTcMDAwMjIFe5iYSIjybL136cunNW56FulIaEoJcfBdY5GWjvJ4/+SJhIcUhwavI5SbIxR+YvzRqH8unx7/Osf8VYpAVEWLgZuO8ljrfbwMDAwMD07u/j/ZYun5f9JfjSfGnHx9dGaCAJcBimwXjZ4Z+HllGn0XbXr+ASQAAi5UxQq88/fsAAAAASUVORK5CYII="></plastic-image>
+```
+
+To automatically compensate for pixel density do not supply _any_ pixel density descriptors in the srcset.
+
+```HTML
+<plastic-image preload fade sizing="contain" use-element-dim
+  srcset="images/foo-s.jpg 150w, images/foo-sh.jpg 300w, images/foo-m.jpg 405w, 
+  images/foo-mh 810w, images/foo-l 1024w, images/foo-t 500w 750h"
   placeholder="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAYAAADgzO9IAAAAmElEQVQImWNmYGBgSExMzBATE7dSVFT8eO/evTcMDAwMjIFe5iYSIjybL136cunNW56FulIaEoJcfBdY5GWjvJ4/+SJhIcUhwavI5SbIxR+YvzRqH8unx7/Osf8VYpAVEWLgZuO8ljrfbwMDAwMD07u/j/ZYun5f9JfjSfGnHx9dGaCAJcBimwXjZ4Z+HllGn0XbXr+ASQAAi5UxQq88/fsAAAAASUVORK5CYII="></plastic-image>
 ```
 
