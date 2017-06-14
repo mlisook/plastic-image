@@ -37,6 +37,11 @@ Example srcset
 
 srcset="foo-s.jpg 150w, foo-sh.jpg 150w 2.0x, foo-m.jpg 405w, foo-mh 2.0x 405w, foo-l 1024w, foo-t 500w 750h"
 
+Automatic Density
+
+If _none_ of the image selection strings includes a pixel density descriptor ('x' e.g. `4.0x`), then the image
+selection process will automatically compensate for the viewport's pixel density.
+
 Examples:
 Use the control as you would an `iron-image` but with the srcset.
 
@@ -50,6 +55,13 @@ To base image selection on the rendered size of the control add the `use-element
 <plastic-image preload fade sizing="contain" use-element-dim
   srcset="images/foo-s.jpg 150w, images/foo-sh.jpg 150w 2.0x, images/foo-m.jpg 405w, 
   images/foo-mh 2.0x 405w, images/foo-l 1024w, images/foo-t 500w 750h"
+  placeholder="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAYAAADgzO9IAAAAmElEQVQImWNmYGBgSExMzBATE7dSVFT8eO/evTcMDAwMjIFe5iYSIjybL136cunNW56FulIaEoJcfBdY5GWjvJ4/+SJhIcUhwavI5SbIxR+YvzRqH8unx7/Osf8VYpAVEWLgZuO8ljrfbwMDAwMD07u/j/ZYun5f9JfjSfGnHx9dGaCAJcBimwXjZ4Z+HllGn0XbXr+ASQAAi5UxQq88/fsAAAAASUVORK5CYII="></plastic-image>
+
+To automatically compensate for pixel density do not supply _any_ pixel density descriptors in the srcset.
+
+<plastic-image preload fade sizing="contain" use-element-dim
+  srcset="images/foo-s.jpg 150w, images/foo-sh.jpg 300w, images/foo-m.jpg 405w, 
+  images/foo-mh 810w, images/foo-l 1024w, images/foo-t 500w 750h"
   placeholder="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAYAAADgzO9IAAAAmElEQVQImWNmYGBgSExMzBATE7dSVFT8eO/evTcMDAwMjIFe5iYSIjybL136cunNW56FulIaEoJcfBdY5GWjvJ4/+SJhIcUhwavI5SbIxR+YvzRqH8unx7/Osf8VYpAVEWLgZuO8ljrfbwMDAwMD07u/j/ZYun5f9JfjSfGnHx9dGaCAJcBimwXjZ4Z+HllGn0XbXr+ASQAAi5UxQq88/fsAAAAASUVORK5CYII="></plastic-image>
 
 Lazy Loading
@@ -187,6 +199,7 @@ the `fallbackSrc` / `fallback-src` attribute instead.
 
             /**
              * At connection, prevent iron-image from loading the image
+             * @private
              */
             connectedCallback() {
                 super.connectedCallback();
@@ -196,6 +209,7 @@ the `fallbackSrc` / `fallback-src` attribute instead.
             /**
              * When attached, parse the srcset string and pick
              * the best image
+             * @private
              */
             attached() {
                 super.attached();
@@ -225,6 +239,7 @@ the `fallbackSrc` / `fallback-src` attribute instead.
             /**
              * When disconnected, remove the intersectionObserver
              * if lazy loading is in effect.
+             * @private
              */
             disconnectedCallback() {
                 super.disconnectedCallback();
@@ -243,6 +258,7 @@ the `fallbackSrc` / `fallback-src` attribute instead.
              * Observer for determining if it is time for
              * the control to set the src property in the
              * underlying iron-image.
+             * @private
              */
             _doImageSelectionObserver(fallbackSrc, srcset, delayLoad, lazyLoadPending) {
                 if (!delayLoad && !lazyLoadPending && (srcset || fallbackSrc)) {
@@ -253,6 +269,7 @@ the `fallbackSrc` / `fallback-src` attribute instead.
             /**
              * Assign the best image to the iron-image src property 
              * and allow it to be loaded
+             * @private
              */
             assignImgSrc() {
                 let srcArray = this.srcset && this.srcset.length > 1 ? this.srcsetParse(this.srcset) : [];
@@ -267,6 +284,7 @@ the `fallbackSrc` / `fallback-src` attribute instead.
             /**
              * Returns a sorted array of only the unique elements of an array
              * @param arr {array} object array
+             * @private
              */
             deepUnique(arr) {
                 return arr.sort().filter((el, i) => {
@@ -342,6 +360,7 @@ the `fallbackSrc` / `fallback-src` attribute instead.
             /**
              * Get best image from srcset
              * @param arr {Array<Isrcset>} srcset array
+             * @private
              */
             bestMatchingImage(arr) {
                 let densityMultiplier = 1;
@@ -386,6 +405,7 @@ the `fallbackSrc` / `fallback-src` attribute instead.
 
             /**
              * filter out disqualified items less than the refVal
+             * @private
              */
             filterLarge(arr, attr, refVal) {
                 if (arr.length < 2) return arr;
@@ -409,6 +429,7 @@ the `fallbackSrc` / `fallback-src` attribute instead.
             }
             /**
              * filter to the smallest items of a dimension
+             * @private
              */
             filterSmall(arr, attr) {
                 if (arr.length < 2) return arr;
@@ -440,6 +461,7 @@ the `fallbackSrc` / `fallback-src` attribute instead.
              *
              * All instances of plastic-image share the same 
              * IntersectionObserver.
+             * @private
              */
             _initLazyLoad() {
                 // if the polyfill is needed and not yet loaded,
@@ -452,8 +474,17 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                     if (!polyfillScript) {
                         polyfillScript = document.createElement("script");
                         polyfillScript.id = 'polyfill-IntersectionObserver';
-                        polyfillScript.src =
-                            "https://polyfill.io/v2/polyfill.min.js?features=IntersectionObserver";
+                        // The current version, 0.3.0, supports Safari which now has
+                        // native shadow DOM.  The version currently served by polyfill.io
+                        // does not support native shadow dom.
+                        //
+                        // Until the polyfill is updated to 0.3.0 or greater on polyfill.io
+                        // we will use version 0.3.0 and include it with the element.
+                        //
+                        // polyfillScript.src =
+                        //    "https://polyfill.io/v2/polyfill.min.js?features=IntersectionObserver";
+                        //
+                        polyfillScript.src = this.importPath + "intersection-observer.js";
                         polyfillScript.async = true;
                         document.head.appendChild(polyfillScript);
                     }
@@ -488,6 +519,7 @@ the `fallbackSrc` / `fallback-src` attribute instead.
             /**
              * called by the intersection observer
              * to indicate a change in intersection
+             * @private
              */
             _lazyLoadCallback(e) {
                 if (e.isIntersecting && this._lazyLoadPending) {
