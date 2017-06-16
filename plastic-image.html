@@ -522,7 +522,7 @@ the `fallbackSrc` / `fallback-src` attribute instead.
              * @private
              */
             _lazyLoadCallback(e) {
-                if (e.isIntersecting && this._lazyLoadPending) {
+                if (this._lazyLoadPending && (e.isIntersecting || e.intersectionRatio >= 0.001)) {
                     this._lazyLoadPending = false;
                 }
             }
