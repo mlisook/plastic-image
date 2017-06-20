@@ -1,11 +1,12 @@
 # \<plastic-image\>
 
-A Polymer 2.0 element which adds extra plasticity to `iron-image` with support for **srcset** and 
-**lazy loading**.
+A Polymer 2.0 element which adds extra plasticity to `iron-image` with support for **srcset**,
+**lazy loading** and **webp** support.
 
 `plastic-image` extends `iron-image` by adding a `srcset` attribute for client side image
-size selection. It also adds a `lazy-load` attribute for deferring the image load until
-the element is showing in the viewport.
+size selection. It adds a `lazy-load` attribute for deferring the image load until
+the element is showing in the viewport. Finally, it allows you to serve (typically smaller) 
+`webp` images to browsers that support webp.
 
 Please review the api docs for `iron-image` as this element is a subclass of `iron-image`.
 
@@ -50,6 +51,25 @@ To use lazy loading simply add the `lazy-load` attribute to the element.
 <plastic-image preload fade lazy-load srcset="..." ... ></plastic-image>
 ```
 
+## Webp Support
+
+You can include `webp` format images alongside images of other formats (e.g. JPG, GiF, PNG) in the `srcset`
+attribute.  If you include one or more webp images and the browser supports webp, the control will select
+the best fit webp image.  If the browser does not support webp, the control will select  the best fit non webp image.
+
+Webp images are typically significantly smaller than JPG or PNG so it can represent a decrease in network traffic.
+
+There are no flags or attributes to enable this support.  Just include webp along with non webp images in the srcset to take advantage.  
+
+### Example Webp
+
+```HTML
+<plastic-image id="wp01" lazy-load preload fade use-element-dim sizing="contain" style="height: 200px; width: 300px;"
+          srcset="images/20160827_055746-150x150.jpg 150w,images/20160827-055746-150x150.webp 150w,images/20160827_055746-300x169.jpg 300w,images/20160827-055746-300x169.webp 300w,images/20160827_055746-768x432.jpg 768w,images/20160827-055746-768x432.webp 768w"
+          placeholder="data: image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD//gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2OTApLCBxdWFsaXR5ID0gODIK/9sAQwAGBAQFBAQGBQUFBgYGBwkOCQkICAkSDQ0KDhUSFhYVEhQUFxohHBcYHxkUFB0nHR8iIyUlJRYcKSwoJCshJCUk/9sAQwEGBgYJCAkRCQkRJBgUGCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQk/8AAEQgACAAOAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8A8p8A/EK70MfZbvVJ0tAuF8qJGcHju3br611Go/EPS7pkY+K7tMDBV7ZevrxHRRXdSzKtTVt/W/8AmeRUwVOc3fr6f5H/2Q==" >
+        </plastic-image>
+``` 
+
 ## Install the Component
 
 `bower install --save plastic-image`
@@ -88,6 +108,17 @@ To defer loading until the image is in (well, at least peaking into) the viewpor
 <plastic-image lazy-load preload fade sizing="contain"
   srcset="images/foo-s.jpg 150w, images/foo-sh.jpg 150w 2.0x, images/foo-m.jpg 405w, 
   images/foo-mh 2.0x 405w, images/foo-l 1024w, images/foo-t 500w 750h"
+  placeholder="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAYAAADgzO9IAAAAmElEQVQImWNmYGBgSExMzBATE7dSVFT8eO/evTcMDAwMjIFe5iYSIjybL136cunNW56FulIaEoJcfBdY5GWjvJ4/+SJhIcUhwavI5SbIxR+YvzRqH8unx7/Osf8VYpAVEWLgZuO8ljrfbwMDAwMD07u/j/ZYun5f9JfjSfGnHx9dGaCAJcBimwXjZ4Z+HllGn0XbXr+ASQAAi5UxQq88/fsAAAAASUVORK5CYII="></plastic-image>
+```
+
+To serve webp images to browsers that support webp and jpg to browsers that do not, simply include
+the alternate webp images in the srcset.  You can mix in width, height and density selectors also.
+
+```HTML
+<plastic-image lazy-load preload fade sizing="contain"
+  srcset="images/foo-s.jpg 150w, images/foo-s.webp 150w, 
+    images/foo-m.jpg 405w, images/foo-m.webp 405w, 
+    images/foo-mh.jpg 2.0x 405w, images/foo-mh.webp 2.0x 405w"
   placeholder="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAYAAAAGCAYAAADgzO9IAAAAmElEQVQImWNmYGBgSExMzBATE7dSVFT8eO/evTcMDAwMjIFe5iYSIjybL136cunNW56FulIaEoJcfBdY5GWjvJ4/+SJhIcUhwavI5SbIxR+YvzRqH8unx7/Osf8VYpAVEWLgZuO8ljrfbwMDAwMD07u/j/ZYun5f9JfjSfGnHx9dGaCAJcBimwXjZ4Z+HllGn0XbXr+ASQAAi5UxQq88/fsAAAAASUVORK5CYII="></plastic-image>
 ```
 

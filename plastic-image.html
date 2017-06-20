@@ -187,6 +187,30 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                     _lazyLoadPending: {
                         type: Boolean,
                         value: true
+                    },
+                    /**
+                     * Indicates that the srcset string has at least one webp image
+                     * @private
+                     */
+                    _hasWebp: {
+                        type: Boolean,
+                        value: false
+                    },
+                    /**
+                     * indicates that the browser supports webp images
+                     * @private
+                     */
+                    _browserSupportsWebp: {
+                        type: Boolean,
+                        value: false
+                    },
+                    /**
+                     * regex test for .webp extension 
+                     * @private
+                     */
+                    _webpRegex: {
+                        type:RegExp,
+                        value: /.+\.webp$/i
                     }
                 };
             }
@@ -273,12 +297,16 @@ the `fallbackSrc` / `fallback-src` attribute instead.
              */
             assignImgSrc() {
                 let srcArray = this.srcset && this.srcset.length > 1 ? this.srcsetParse(this.srcset) : [];
-                this._selectedImgUrl = srcArray.length > 0 ? this.bestMatchingImage(srcArray) :
-                    this.fallbackSrc;
-                if (this._selectedImgUrl) {
-                    if (!this.src || this.src !== this._selectedImgUrl) this.src = this._selectedImgUrl;
-                    this.preventLoad = false;
-                }
+                // webp filtering promise
+                this._checkBrowserWebpSupport(srcArray)
+                    .then((arr) => {
+                        this._selectedImgUrl = srcArray.length > 0 ? this.bestMatchingImage(arr) :
+                            this.fallbackSrc;
+                        if (this._selectedImgUrl) {
+                            if (!this.src || this.src !== this._selectedImgUrl) this.src = this._selectedImgUrl;
+                            this.preventLoad = false;
+                        }
+                    });
             }
 
             /**
@@ -299,6 +327,7 @@ the `fallbackSrc` / `fallback-src` attribute instead.
              */
             srcsetParse(str) {
                 let reInt = /^\d+$/;
+                this._hasWebp = false;
                 return this.deepUnique(str.split(',').map((el) => {
                     var ret = {
                         url: ""
@@ -306,6 +335,9 @@ the `fallbackSrc` / `fallback-src` attribute instead.
 
                     el.trim().split(/\s+/).forEach((el, i) => {
                         if (i === 0) {
+                            if (this._webpRegex.test(el)) {
+                                this._hasWebp = true;
+                            }
                             return ret.url = el;
                         }
 
@@ -368,25 +400,28 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                 // Check if denisty is provided in srcset
                 let hasDensity = false;
                 arr.forEach(function (src) {
-                    if("density" in src){
+                    if ("density" in src) {
                         hasDensity = true;
                     }
                 });
 
-                if(!hasDensity){
-                  // When no density is set use devicePixelRatio as a multiplier for reference dimensions
-                  densityMultiplier = (window.devicePixelRatio || 1.0);
+                if (!hasDensity) {
+                    // When no density is set use devicePixelRatio as a multiplier for reference dimensions
+                    densityMultiplier = (window.devicePixelRatio || 1.0);
                 }
 
                 // referance dimensions
                 let refDim = this.useElementDim ? {
-                    width: (this.clientWidth || window.innerWidth || document.documentElement.clientWidth) * densityMultiplier,
-                    height: (this.clientHeight || window.innerHeight || document.documentElement.clientHeight) * densityMultiplier,
+                    width: (this.clientWidth || window.innerWidth || document.documentElement.clientWidth) *
+                        densityMultiplier,
+                    height: (this.clientHeight || window.innerHeight || document.documentElement.clientHeight) *
+                        densityMultiplier,
                     // When no density is provided densityMultiplier is used and density filter can be set to 1, otherwise use devicePixelRatio
                     density: !hasDensity ? 1 : (window.devicePixelRatio || 1.0)
                 } : {
                     width: (window.innerWidth || document.documentElement.clientWidth) * densityMultiplier,
-                    height: (window.innerHeight || document.documentElement.clientHeight) * densityMultiplier,
+                    height: (window.innerHeight || document.documentElement.clientHeight) *
+                        densityMultiplier,
                     // When no density is provided densityMultiplier is used and density filter can be set to 1, otherwise use devicePixelRatio
                     density: !hasDensity ? 1 : (window.devicePixelRatio || 1.0)
                 };
@@ -527,6 +562,65 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                 }
             }
 
+            /**
+             * Checks if the srcset has a webp image, and if so if the
+             * browser supports webp. Returns a filtered copy of the srcset
+             * array depending on support. Saves the detection so that other 
+             * instances of plastic image do not have to perform the feature
+             * test.
+             *
+             * @param srcarr {source set array}
+             * @return promise of filtered source set array
+             * @private
+             */
+            _checkBrowserWebpSupport(srcarr) {
+                return new Promise((resolve, reject) => {
+                    // if there are no webp images, return the original array
+                    if (!this._hasWebp) {
+                        resolve(srcarr);
+                    } else {
+                        // if webp has previously been detected, use the prior detection
+                        if (window.plasticImageWebp) {
+                            resolve(this._filterWebp(srcarr, window.plasticImageWebp.supports));
+                        } else {
+                            // support has not been previously detected so
+                            // do a new test for webp support
+                            let wpimg = new Image();
+                            wpimg.onload = () => {
+                                let result = (wpimg.width > 0) && (wpimg.height > 0);
+                                window.plasticImageWebp = {
+                                    supports: result
+                                };
+                                resolve(this._filterWebp(srcarr, result));
+                            };
+                            wpimg.onerror = () => {
+                                window.plasticImageWebp = {
+                                    supports: false
+                                };
+                                resolve(this._filterWebp(srcarr, false));
+                            }
+                            wpimg.src =
+                                "data:image/webp;base64,UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==";
+                        }
+                    }
+                });
+            }
+
+            /**
+             * Returns a filtered copy of the source set array
+             * including only webp images if supports is true,
+             * or only non webp images if supports is false.
+             *
+             * @param srcarr {source set array}
+             * @param supports {boolean} indicates if the browser supports webp
+             * @returns filtered source set array
+             * @private
+             */
+            _filterWebp(srcarr, supports) {
+                return srcarr.filter((srcitem) => {
+                    return this._webpRegex.test(srcitem.url) === supports;
+                })
+            }
         }
 
         window.customElements.define(PlasticImage.is, PlasticImage);
