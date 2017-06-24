@@ -285,7 +285,7 @@ the `fallbackSrc` / `fallback-src` attribute instead.
              * @private
              */
             _doImageSelectionObserver(fallbackSrc, srcset, delayLoad, lazyLoadPending) {
-                if (!delayLoad && !lazyLoadPending && (srcset || fallbackSrc)) {
+                if (!delayLoad && !lazyLoadPending) {
                     this.assignImgSrc();
                 }
             }
@@ -302,10 +302,9 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                     .then((arr) => {
                         this._selectedImgUrl = srcArray.length > 0 ? this.bestMatchingImage(arr) :
                             this.fallbackSrc;
-                        if (this._selectedImgUrl) {
-                            if (!this.src || this.src !== this._selectedImgUrl) this.src = this._selectedImgUrl;
-                            this.preventLoad = false;
-                        }
+
+                        if (!this.src || this.src !== this._selectedImgUrl) this.src = this._selectedImgUrl;
+                        this.preventLoad = false;
                     });
             }
 
