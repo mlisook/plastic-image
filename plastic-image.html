@@ -88,27 +88,6 @@ the `fallbackSrc` / `fallback-src` attribute instead.
 -->
 
 <dom-module id="plastic-image">
-    <!--    
-  <template>
-    <style>
-       :host {
-        display: block;
-      }
-
-      resize-aware {
-        width: 100%;
-        height: 100%;
-      }
-    </style>
-
-   
-
-    <resize-aware on-element-size-changed="_sizeChanged">
-      <iron-image placeholder="[[placeholder]]" style="width: 100%; height:200px;" sizing="cover" fade preload src="[[_selectedImgUrl]]"></iron-image>
-    </resize-aware>
-
-  </template>
--->
     <script>
         /**
          * `plastic-image`
@@ -121,6 +100,13 @@ the `fallbackSrc` / `fallback-src` attribute instead.
         class PlasticImage extends customElements.get('iron-image') {
             static get is() {
                 return 'plastic-image';
+            }
+            // clone the iron-image template for issue 14 - no idea why this works
+            static get template() {
+                if (!window.PlasticImageTemplate) {
+                    window.PlasticImageTemplate = customElements.get('iron-image').template.cloneNode(true);
+                }
+                return window.PlasticImageTemplate;
             }
             static get properties() {
                 return {
@@ -209,7 +195,7 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                      * @private
                      */
                     _webpRegex: {
-                        type:RegExp,
+                        type: RegExp,
                         value: /.+\.webp$/i
                     }
                 };

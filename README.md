@@ -1,7 +1,7 @@
 # \<plastic-image\>
 
 A Polymer 2.0 element which adds extra plasticity to `iron-image` with support for **srcset**,
-**lazy loading** and **webp** support.
+**lazy loading** and **webp**.
 
 `plastic-image` extends `iron-image` by adding a `srcset` attribute for client side image
 size selection. It adds a `lazy-load` attribute for deferring the image load until
