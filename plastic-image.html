@@ -253,13 +253,13 @@ the `fallbackSrc` / `fallback-src` attribute instead.
              */
             disconnectedCallback() {
                 super.disconnectedCallback();
-                if (this.lazyLoad && window.plasticImageIntersectionObserver) {
+                if (this.lazyLoad && this._lazyLoadPending && window.plasticImageIntersectionObserver) {
                     window.plasticImageIntersectionObserver.observer.unobserve(this);
-                    window.plasticImageIntersectionObserver.counter--;
-
-                    if (window.plasticImageIntersectionObserver.counter <= 0) {
-                        window.plasticImageIntersectionObserver.observer.disconnect();
-                        window.plasticImageIntersectionObserver = null;
+                    // Firefox is frequently calling disconnectedCallback twice
+                    // per element.  So basically this counter is useless,
+                    // but on the bright side, it's no longer needed.
+                    if (window.plasticImageIntersectionObserver.counter > 0) {
+                        window.plasticImageIntersectionObserver.counter--;
                     }
                 }
             }
@@ -481,9 +481,10 @@ the `fallbackSrc` / `fallback-src` attribute instead.
              *
              * All instances of plastic-image share the same 
              * IntersectionObserver.
+             * @param {boolean} polyfilled - is this being called after polyfill loaded
              * @private
              */
-            _initLazyLoad() {
+            _initLazyLoad(polyfilled) {
                 // if the polyfill is needed and not yet loaded,
                 // wait for it to load first.
                 if (!('IntersectionObserver' in window)) {
@@ -492,6 +493,13 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                     // one time.
                     let polyfillScript = document.getElementById('polyfill-IntersectionObserver');
                     if (!polyfillScript) {
+                        // load ua-parser-js to reliably parse the user-agent
+                        // and detect if MS Edge is the browser
+                        let uaParserScript = document.createElement("script");
+                        uaParserScript.id = 'polyfill-IntersectionObserver-ua-parser-js';
+                        uaParserScript.src = this.importPath + "../ua-parser-js/dist/ua-parser.min.js";
+                        document.head.appendChild(uaParserScript);
+                        // load the intersection-observer polyfill script
                         polyfillScript = document.createElement("script");
                         polyfillScript.id = 'polyfill-IntersectionObserver';
                         // The current version, 0.3.0, supports Safari which now has
@@ -512,7 +520,7 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                     // then retry the initLazyLoad process
                     polyfillScript.addEventListener("load", () => {
                         setTimeout(() => {
-                            this._initLazyLoad();
+                            this._initLazyLoad(true);
                         }, 300);
                     });
                 } else {
@@ -524,11 +532,19 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                             counter: 0,
                             /* an IntersectionObserver with only default arguments */
                             observer: new IntersectionObserver(function (entries, observer) {
-                                for (let i = 0; i < entries.length; i++) {
-                                    entries[i].target._lazyLoadCallback(entries[i]);
-                                }
+                                entries.forEach(function (entry) {
+                                    entry.target._lazyLoadCallback(entry);
+                                });
                             }, {})
                         };
+                        if (polyfilled) {
+                            // issue 23 - Edge does not reliably dispatch scroll events
+                            let uaparser = new UAParser();
+                            let uapResult = uaparser.getResult();
+                            if (uapResult && uapResult.browser && uapResult.browser.name == "Edge") {
+                                window.plasticImageIntersectionObserver.observer.POLL_INTERVAL = 300;
+                            }
+                        }
                     }
                     // observe this element
                     window.plasticImageIntersectionObserver.observer.observe(this);
@@ -542,8 +558,16 @@ the `fallbackSrc` / `fallback-src` attribute instead.
              * @private
              */
             _lazyLoadCallback(e) {
+                // if we are intersecting, set _lazyLoadPending false to allow the image to load
+                // and stop observing intersections for this element
                 if (this._lazyLoadPending && (e.isIntersecting || e.intersectionRatio >= 0.001)) {
                     this._lazyLoadPending = false;
+                    if (window.plasticImageIntersectionObserver && window.plasticImageIntersectionObserver.observer) {
+                        window.plasticImageIntersectionObserver.observer.unobserve(this);
+                        if (window.plasticImageIntersectionObserver.counter > 0) {
+                            window.plasticImageIntersectionObserver.counter--;
+                        }
+                    }
                 }
             }
 
