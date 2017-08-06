@@ -117,6 +117,7 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                     srcset: {
                         type: String
                     },
+
                     /**
                      * The image url selected from srcset rules
                      */
@@ -203,7 +204,8 @@ the `fallbackSrc` / `fallback-src` attribute instead.
 
             static get observers() {
                 return [
-                    '_doImageSelectionObserver(fallbackSrc, srcset, delayLoad, _lazyLoadPending)'
+                    '_doImageSelectionObserver(fallbackSrc, srcset, delayLoad, _lazyLoadPending)',
+                    '_cleanupWillChange(fade, loaded, src)'
                 ]
             }
 
@@ -217,6 +219,12 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                 super.connectedCallback();
                 this.preventLoad = true;
 
+                //Because we're fading, hint the browser that this property
+                //will change and thus placing it on a separate GPU layer.
+                if (this.fade) {
+                  this.$.placeholder.style.willChange = 'opacity'
+                }
+
                 // if lazy loading, set up the intersection
                 // observer. Otherwise, go ahead and process
                 // the image selection
@@ -226,16 +234,7 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                     this._lazyLoadPending = false;
 
                     if (!this.delayLoad) {
-                        if (this.useElementDim) {
-                            // if using the element's dimensions instead of
-                            // the viewport, wait until render so that the
-                            // element will have a clientWidth and clientHeight
-                            Polymer.RenderStatus.beforeNextRender(this, () => {
-                                this.assignImgSrc();
-                            });
-                        } else {
-                            this.assignImgSrc();
-                        }
+                        this.assignImgSrc();
                     }
                 }
             }
@@ -271,20 +270,45 @@ the `fallbackSrc` / `fallback-src` attribute instead.
             }
 
             /**
-             * Assign the best image to the iron-image src property 
+             * By removing the will-change property the image can go off the separate layer (freeing up memory).
+             */
+            _cleanupWillChange(fade, loaded, src) {
+              if (!fade || !loaded || !src) {
+                //Nothing to clean up (yet)
+                return;
+              }
+
+              //Execute no sooner than the animation has finished
+              //and let the browser its self determine the right moment.
+              Polymer.Async.timeOut.run(_ => Polymer.Async.idlePeriod.run(_ => {
+                this.$.placeholder.style.willChange = ''
+              }), 500);
+            }
+
+            /**
+             * Assign the best image to the iron-image src property
              * and allow it to be loaded
              * @private
              */
             assignImgSrc() {
                 let srcArray = this.srcset && this.srcset.length > 1 ? this.srcsetParse(this.srcset) : [];
+
                 // webp filtering promise
                 this._checkBrowserWebpSupport(srcArray)
                     .then((arr) => {
+                      // Since we might need dimensions, schedule this
+                      // right before the render of the frame so that
+                      // clientWidth and clientHeight are available.
+                      Polymer.RenderStatus.beforeNextRender(this, () => {
                         this._selectedImgUrl = srcArray.length > 0 ? this.bestMatchingImage(arr) :
                             this.fallbackSrc;
 
-                        if (!this.src || this.src !== this._selectedImgUrl) this.src = this._selectedImgUrl;
+                        if (!this.src || this.src !== this._selectedImgUrl) {
+                          this.src = this._selectedImgUrl;
+                        }
+
                         this.preventLoad = false;
+                      });
                     });
             }
 
@@ -294,9 +318,7 @@ the `fallbackSrc` / `fallback-src` attribute instead.
              * @private
              */
             deepUnique(arr) {
-                return arr.sort().filter((el, i) => {
-                    return JSON.stringify(el) !== JSON.stringify(arr[i - 1]);
-                });
+                return arr.sort().filter((el, i) => JSON.stringify(el) !== JSON.stringify(arr[i - 1]));
             }
 
             /**
@@ -745,10 +767,10 @@ the `fallbackSrc` / `fallback-src` attribute instead.
              *
              * All instances of plastic-image share the same 
              * IntersectionObserver.
-             * @param {boolean} polyfilled - is this being called after polyfill loaded
+             * @param {Boolean} polyfilled - is this being called after polyfill loaded
              * @private
              */
-            _initLazyLoad(polyfilled) {
+            _initLazyLoad(polyfilled = false) {
                 // if the polyfill is needed and not yet loaded,
                 // wait for it to load first.
                 if (!('IntersectionObserver' in window)) {
@@ -783,9 +805,8 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                     // listen for the polyfill to finish loading
                     // then retry the initLazyLoad process
                     polyfillScript.addEventListener("load", () => {
-                        setTimeout(() => {
-                            this._initLazyLoad(true);
-                        }, 300);
+                        //@todo using milliseconds is an anti-pattern.
+                        setTimeout(() => this._initLazyLoad(true), 300);
                     });
                 } else {
                     // IntersectionObserver is available, initialize observation
