@@ -140,6 +140,16 @@ fetch('imageDetail/47561').then((response) => {
 });
 ```
 
+## Polymer Build / polymer.json
+The element may automaticall loads 2 polyfill scripts to support IntersectionObserver on browsers where native support is not available. These are not detected by the Polymer build analyzer. If you are using `polymer build` you should modify the `polymer.json` file to include these scripts in your build by adding them to the `extraDependencies` array:
+```Javascript
+"extraDependencies": [
+    "bower_components/plastic-image/intersection-observer.js",
+    "bower_components/ua-parser-js/dist/ua-parser.min.js",
+    ...
+  ]
+  ```
+
 ## Standard iron-image properties that should not be used
 Do not use `preventLoad` / `prevent-load`.  This is used internally by `plastic-image` to allow the srcset processing step.
 To achieve that function use `delayLoad` / `delay-load` instead.
