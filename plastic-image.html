@@ -130,7 +130,7 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                      * evaluating the srcset. Set in the markup
                      * as delay-load and when you are ready set
                      * the property value to false.
-                     * 
+                     *
                      * For example you may be retrieving the srcset
                      * from an ajax call. You would set this to true
                      * in the markup and set it to false once the data
@@ -176,14 +176,6 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                         value: true
                     },
                     /**
-                     * Indicates that the srcset string has at least one webp image
-                     * @private
-                     */
-                    _hasWebp: {
-                        type: Boolean,
-                        value: false
-                    },
-                    /**
                      * indicates that the browser supports webp images
                      * @private
                      */
@@ -192,7 +184,7 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                         value: false
                     },
                     /**
-                     * regex test for .webp extension 
+                     * regex test for .webp extension
                      * @private
                      */
                     _webpRegex: {
@@ -670,7 +662,7 @@ the `fallbackSrc` / `fallback-src` attribute instead.
 
                 // Check if denisty is provided in srcset
                 let hasDensity = false;
-                arr.forEach(function (src) {
+                arr.forEach((src) => {
                     if ("density" in src) {
                         hasDensity = true;
                     }
@@ -681,7 +673,7 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                     densityMultiplier = (window.devicePixelRatio || 1.0);
                 }
 
-                // referance dimensions
+                // reference dimensions
                 let refDim = this.useElementDim ? {
                     width: (this.clientWidth || window.innerWidth || document.documentElement.clientWidth) *
                         densityMultiplier,
@@ -758,14 +750,14 @@ the `fallbackSrc` / `fallback-src` attribute instead.
             }
 
             /**
-             * initialize lazy loading process by 
+             * initialize lazy loading process by
              * creating an intersection observer and
              * adding this element to the observation
              * list.
              *
              * Waits for the polyfill to load, if necessary
              *
-             * All instances of plastic-image share the same 
+             * All instances of plastic-image share the same
              * IntersectionObserver.
              * @param {Boolean} polyfilled - is this being called after polyfill loaded
              * @private
@@ -804,10 +796,7 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                     }
                     // listen for the polyfill to finish loading
                     // then retry the initLazyLoad process
-                    polyfillScript.addEventListener("load", () => {
-                        //@todo using milliseconds is an anti-pattern.
-                        setTimeout(() => this._initLazyLoad(true), 300);
-                    });
+                    polyfillScript.addEventListener("load", _ => this._initLazyLoad(true));
                 } else {
                     // IntersectionObserver is available, initialize observation
                     // Create the observer for this page if it doesn't exist
@@ -816,8 +805,8 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                             /* the number of elements sharing this observer */
                             counter: 0,
                             /* an IntersectionObserver with only default arguments */
-                            observer: new IntersectionObserver(function (entries, observer) {
-                                entries.forEach(function (entry) {
+                            observer: new IntersectionObserver((entries, observer) => {
+                                entries.forEach((entry) => {
                                     entry.target._lazyLoadCallback(entry);
                                 });
                             }, {})
@@ -859,43 +848,37 @@ the `fallbackSrc` / `fallback-src` attribute instead.
             /**
              * Checks if the srcset has a webp image, and if so if the
              * browser supports webp. Returns a filtered copy of the srcset
-             * array depending on support. Saves the detection so that other 
+             * array depending on support. Saves the detection so that other
              * instances of plastic image do not have to perform the feature
              * test.
              *
-             * @param srcarr {source set array}
+             * @param srcArray {source set array}
              * @return promise of filtered source set array
              * @private
              */
-            _checkBrowserWebpSupport(srcarr) {
+            _checkBrowserWebpSupport(srcArray) {
                 return new Promise((resolve, reject) => {
-                    // if there are no webp images, return the original array
-                    if (!this._hasWebp) {
-                        resolve(srcarr);
+                    // if webp has previously been detected, use the prior detection
+                    if (window.plasticImageWebp) {
+                        resolve(this._filterWebp(srcArray, window.plasticImageWebp.supports));
                     } else {
-                        // if webp has previously been detected, use the prior detection
-                        if (window.plasticImageWebp) {
-                            resolve(this._filterWebp(srcarr, window.plasticImageWebp.supports));
-                        } else {
-                            // support has not been previously detected so
-                            // do a new test for webp support
-                            let wpimg = new Image();
-                            wpimg.onload = () => {
-                                let result = (wpimg.width > 0) && (wpimg.height > 0);
-                                window.plasticImageWebp = {
-                                    supports: result
-                                };
-                                resolve(this._filterWebp(srcarr, result));
+                        // support has not been previously detected so
+                        // do a new test for webp support
+                        let webpImg = new Image();
+                        webpImg.onload = () => {
+                            let result = (webpImg.width > 0) && (webpImg.height > 0);
+                            window.plasticImageWebp = {
+                                supports: result
                             };
-                            wpimg.onerror = () => {
-                                window.plasticImageWebp = {
-                                    supports: false
-                                };
-                                resolve(this._filterWebp(srcarr, false));
-                            }
-                            wpimg.src =
-                                "data:image/webp;base64,UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==";
+                            resolve(this._filterWebp(srcArray, result));
+                        };
+                        webpImg.onerror = () => {
+                            window.plasticImageWebp = {
+                                supports: false
+                            };
+                            resolve(this._filterWebp(srcArray, false));
                         }
+                        webpImg.src = "data:image/webp;base64,UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==";
                     }
                 });
             }
@@ -905,13 +888,13 @@ the `fallbackSrc` / `fallback-src` attribute instead.
              * including only webp images if supports is true,
              * or only non webp images if supports is false.
              *
-             * @param srcarr {source set array}
+             * @param srcArray {source set array}
              * @param supports {boolean} indicates if the browser supports webp
              * @returns filtered source set array
              * @private
              */
-            _filterWebp(srcarr, supports) {
-                return srcarr.filter((srcitem) => {
+            _filterWebp(srcArray, supports) {
+                return srcArray.filter((srcitem) => {
                     return this._webpRegex.test(srcitem.url) === supports;
                 })
             }
