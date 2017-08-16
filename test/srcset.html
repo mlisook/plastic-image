@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <link rel="import" href="../../polymer/polymer-element.html">
+    <!-- <script src="../../test-fixture/test-fixture-mocha.js"></script> -->
+    <link rel="import" href="../../iron-test-helpers/iron-test-helpers.html">
+    <link rel="import" href="../plastic-image.html">
+    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../iron-test-helpers/mock-interactions.js"></script>
+    <script src="../../chai/chai.js"></script>
+
+</head>
+
+<body>
+
+    <test-fixture id="default">
+        <template>
+            <plastic-image id="i51" preload fade placeholder="data: image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD//gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2OTApLCBxdWFsaXR5ID0gODIK/9sAQwAGBAQFBAQGBQUFBgYGBwkOCQkICAkSDQ0KDhUSFhYVEhQUFxohHBcYHxkUFB0nHR8iIyUlJRYcKSwoJCshJCUk/9sAQwEGBgYJCAkRCQkRJBgUGCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQk/8AAEQgAEwAOAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8AxPGPj298dxz7khtLS0ZQtsgH3+hZmwCTyeOg/PPNPHJcRK6OqKPlLMOCfQV2WgfCSyiguRcX91G1xgsUfHIwcjnnn1/lXNeM9L07QGX7PcSxRysAkpA3MAMEc4PXnjjn6V5FSuqsr3uz01SlSprSx6Rqc8senyMjspWMkY7HHWuO1u2gvr7N1BFNsQBQ6Ahclug6dqKK5aO5310f/9k="
+                sizing="contain" srcset="images/IMG_20170426_112820-150x150.jpg 150w, images/IMG_20170426_112820-225x300.jpg 225w"
+                style="height: 400px; width: 400px;">
+            </plastic-image>
+            <plastic-image id="i50" use-element-dim preload fade placeholder="data: image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD//gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2OTApLCBxdWFsaXR5ID0gODIK/9sAQwAGBAQFBAQGBQUFBgYGBwkOCQkICAkSDQ0KDhUSFhYVEhQUFxohHBcYHxkUFB0nHR8iIyUlJRYcKSwoJCshJCUk/9sAQwEGBgYJCAkRCQkRJBgUGCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQk/8AAEQgACwAOAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8Aq6FfQ+F7JLPUYLG/uYRgSrbsjFTzjJYZI75H51R1j4qiG8WHTdJsJEMYc/JI5Gfow9+Pauz8X+GdJl8LWUjWn7yARhJBI4flTnLA5boOuelcvoOi6dq/h22uLuzhM4CqZYx5TP8AL/EUwW6Dk5pQzOtGCjF2KlgqTk21qf/Z"
+                sizing="contain" srcset="images/IMG_20170425_111558-150x150.jpg  150w,   images/IMG_20170425_111558-300x225.jpg    300w,images/IMG_20170425_111558-768x576.jpg 768w"
+                style="height: 300px; width: 80%;">
+            </plastic-image>
+            <plastic-image id="i49" use-element-dim preload fade placeholder="data: image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD//gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2OTApLCBxdWFsaXR5ID0gODIK/9sAQwAGBAQFBAQGBQUFBgYGBwkOCQkICAkSDQ0KDhUSFhYVEhQUFxohHBcYHxkUFB0nHR8iIyUlJRYcKSwoJCshJCUk/9sAQwEGBgYJCAkRCQkRJBgUGCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQk/8AAEQgACwAOAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8A19d8feKrTRLstqq28hiO1tkasM8Aj5ev5Gq1p4/8WS6RZSJrckmYly6QROWIGDk7Tznr71ieKEW6kjtpwJIiwO1uec4/qai8OItvZiKIbEBJCj8Kz5I3tYFJtH//2Q=="
+                sizing="contain" srcset="images/IMG_20170224_181033-150x150.jpg 150w,images/IMG_20170224_181033-300x225.jpg?foo=y,bar=123 300w, images/IMG_20170224_181033-768x576.jpg 768w"
+                style="height: 200px; width: 300px;">
+            </plastic-image>
+        </template>
+    </test-fixture>
+
+    <script>
+        describe('plastic-image srcset parsing', () => {
+            let testFixture1, findSrcsetEntry, i51, i50, i49;
+            // IE does not have array.find
+            if (Array.prototype && Array.prototype.find) {
+                findSrcsetEntry = (arr, url) => {
+                    return arr.find((item) => {
+                        return item.url == url;
+                    })
+                }
+            } else {
+                findSrcsetEntry = (arr, url) => {
+                    let filtered = arr.filter((item) => {
+                        return item.url == url;
+                    });
+                    if (filtered && filtered.length > 0) {
+                        return filtered[0];
+                    } else {
+                        return undefined;
+                    }
+                }
+            }
+            let selectedImgUrl = (el) => {
+                return el.bestMatchingImage(el.srcsetParse(el.srcset));
+            };
+            beforeEach(() => {
+                testFixture1 = fixture('default');
+                i51 = document.querySelector('#i51');
+                i50 = document.querySelector('#i50');
+                i49 = document.querySelector('#i49');
+            });
+            context('basic srcset parsing', () => {
+                it('should parse a basic srcset', () => {
+                    expect(i51.srcsetParse(i51.srcset).length).to.eql(2);
+                });
+                it('should tolerate extra spacing', () => {
+                    let i50sa = i50.srcsetParse(i50.srcset);
+                    expect(i50sa.length).to.eql(3);
+                    let i50sa2 = findSrcsetEntry(i50sa,
+                        'images/IMG_20170425_111558-300x225.jpg');
+                    expect(i50sa2).to.not.be.a('undefined');
+                    expect(i50sa2).to.have.property('width');
+                    expect(i50sa2.width).to.eql(300);
+                });
+                it('should parse urls with query string and commas', () => {
+                    let i49sa = i49.srcsetParse(i49.srcset);
+                    expect(i49sa.length).to.eql(3);
+                    let i49sa2 = findSrcsetEntry(i49sa,
+                        'images/IMG_20170224_181033-300x225.jpg?foo=y,bar=123');
+                    expect(i49sa2).to.not.be.a('undefined');
+                    expect(i49sa2).to.have.property('width');
+                    expect(i49sa2.width).to.eql(300);
+                    let i49sa3 = findSrcsetEntry(i49sa,
+                        'images/IMG_20170224_181033-768x576.jpg');
+                    expect(i49sa3).to.not.be.a('undefined');
+                    expect(i49sa3).to.have.property('width');
+                    expect(i49sa3.width).to.eql(768);
+                });
+            });
+            context('width based selection', () => {
+                it('should pick the right image by width', () => {
+                    expect(selectedImgUrl(i51)).to.eql('images/IMG_20170426_112820-225x300.jpg');
+                    expect(selectedImgUrl(i49)).to.eql(
+                        'images/IMG_20170224_181033-300x225.jpg?foo=y,bar=123');
+                });
+            });
+            //
+            // TODO: add tests for density, height and combinations of selectors
+            //
+        });
+    </script>
+
+</body>
+
+</html>
