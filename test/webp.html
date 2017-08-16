@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <link rel="import" href="../../polymer/polymer-element.html">
+    <!-- <script src="../../test-fixture/test-fixture-mocha.js"></script> -->
+    <link rel="import" href="../../iron-test-helpers/iron-test-helpers.html">
+    <link rel="import" href="../plastic-image.html">
+    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../iron-test-helpers/mock-interactions.js"></script>
+    <script src="../../chai/chai.js"></script>
+
+</head>
+
+<body>
+
+
+    <test-fixture id="webpFixture">
+        <template>
+            <plastic-image id="wp01" preload fade use-element-dim sizing="contain" style="height: 200px; width: 300px;" srcset="images/20160827_055746-150x150.jpg 150w,images/20160827-055746-150x150.webp 150w,images/20160827_055746-300x169.jpg 300w,images/20160827-055746-300x169.webp 300w,images/20160827_055746-768x432.jpg 768w,images/20160827-055746-768x432.webp 768w"
+                placeholder="data: image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD//gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2OTApLCBxdWFsaXR5ID0gODIK/9sAQwAGBAQFBAQGBQUFBgYGBwkOCQkICAkSDQ0KDhUSFhYVEhQUFxohHBcYHxkUFB0nHR8iIyUlJRYcKSwoJCshJCUk/9sAQwEGBgYJCAkRCQkRJBgUGCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQk/8AAEQgACAAOAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8A8p8A/EK70MfZbvVJ0tAuF8qJGcHju3br611Go/EPS7pkY+K7tMDBV7ZevrxHRRXdSzKtTVt/W/8AmeRUwVOc3fr6f5H/2Q==">
+            </plastic-image>
+            <plastic-image id="i51" preload fade placeholder="data: image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD//gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2OTApLCBxdWFsaXR5ID0gODIK/9sAQwAGBAQFBAQGBQUFBgYGBwkOCQkICAkSDQ0KDhUSFhYVEhQUFxohHBcYHxkUFB0nHR8iIyUlJRYcKSwoJCshJCUk/9sAQwEGBgYJCAkRCQkRJBgUGCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQk/8AAEQgAEwAOAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8AxPGPj298dxz7khtLS0ZQtsgH3+hZmwCTyeOg/PPNPHJcRK6OqKPlLMOCfQV2WgfCSyiguRcX91G1xgsUfHIwcjnnn1/lXNeM9L07QGX7PcSxRysAkpA3MAMEc4PXnjjn6V5FSuqsr3uz01SlSprSx6Rqc8senyMjspWMkY7HHWuO1u2gvr7N1BFNsQBQ6Ahclug6dqKK5aO5310f/9k="
+                sizing="contain" srcset="images/IMG_20170426_112820-150x150.jpg 150w, images/IMG_20170426_112820-225x300.jpg 225w"
+                style="height: 400px; width: 400px;">
+            </plastic-image>
+            <plastic-image id="i50" use-element-dim preload fade placeholder="data: image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD//gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2OTApLCBxdWFsaXR5ID0gODIK/9sAQwAGBAQFBAQGBQUFBgYGBwkOCQkICAkSDQ0KDhUSFhYVEhQUFxohHBcYHxkUFB0nHR8iIyUlJRYcKSwoJCshJCUk/9sAQwEGBgYJCAkRCQkRJBgUGCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQk/8AAEQgACwAOAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8Aq6FfQ+F7JLPUYLG/uYRgSrbsjFTzjJYZI75H51R1j4qiG8WHTdJsJEMYc/JI5Gfow9+Pauz8X+GdJl8LWUjWn7yARhJBI4flTnLA5boOuelcvoOi6dq/h22uLuzhM4CqZYx5TP8AL/EUwW6Dk5pQzOtGCjF2KlgqTk21qf/Z"
+                sizing="contain" srcset="images/IMG_20170425_111558-150x150.jpg  150w,   images/IMG_20170425_111558-300x225.jpg    300w,images/IMG_20170425_111558-768x576.jpg 768w"
+                style="height: 300px; width: 80%;">
+            </plastic-image>
+            <plastic-image id="i49" use-element-dim preload fade placeholder="data: image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD//gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2OTApLCBxdWFsaXR5ID0gODIK/9sAQwAGBAQFBAQGBQUFBgYGBwkOCQkICAkSDQ0KDhUSFhYVEhQUFxohHBcYHxkUFB0nHR8iIyUlJRYcKSwoJCshJCUk/9sAQwEGBgYJCAkRCQkRJBgUGCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQk/8AAEQgACwAOAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8A19d8feKrTRLstqq28hiO1tkasM8Aj5ev5Gq1p4/8WS6RZSJrckmYly6QROWIGDk7Tznr71ieKEW6kjtpwJIiwO1uec4/qai8OItvZiKIbEBJCj8Kz5I3tYFJtH//2Q=="
+                sizing="contain" srcset="images/IMG_20170224_181033-150x150.jpg 150w,images/IMG_20170224_181033-300x225.jpg?foo=y,bar=123 300w, images/IMG_20170224_181033-768x576.jpg 768w"
+                style="height: 200px; width: 300px;">
+            </plastic-image>
+        </template>
+    </test-fixture>
+
+    <script>
+        describe('plastic-image webp detection', () => {
+            let testFixture1, findSrcsetEntry, i51, i50, i49, wp01;
+            // IE does not have array.find
+            if (Array.prototype && Array.prototype.find) {
+                findSrcsetEntry = (arr, url) => {
+                    return arr.find((item) => {
+                        return item.url == url;
+                    })
+                }
+            } else {
+                findSrcsetEntry = (arr, url) => {
+                    let filtered = arr.filter((item) => {
+                        return item.url == url;
+                    });
+                    if (filtered && filtered.length > 0) {
+                        return filtered[0];
+                    } else {
+                        return undefined;
+                    }
+                }
+            }
+            let selectedImgUrl = (el) => {
+                return el.bestMatchingImage(el.srcsetParse(el.srcset));
+            };
+            beforeEach(() => {
+                testFixture1 = fixture('webpFixture');
+                i51 = document.querySelector('#i51');
+                i50 = document.querySelector('#i50');
+                i49 = document.querySelector('#i49');
+                wp01 = document.querySelector('#wp01');
+                wp01.assignImgSrc();
+                i51.assignImgSrc();
+                i50.assignImgSrc();
+                i49.assignImgSrc();
+            });
+            context('feature detection', () => {
+
+                it('should determine support if srcset has webp', () => {
+                    let webpRegex = /.+\.webp$/;
+                    let srcarr = wp01.srcsetParse(wp01.srcset);
+                    return wp01._checkBrowserWebpSupport(srcarr)
+                        .then((arr) => {
+                            expect(wp01._supportsWebp).to.not.be.a('undefined');
+                            expect(arr.length).to.eql(3);
+                            let c = arr.filter((item) => {
+                                return webpRegex.test(item.url) == wp01._supportsWebp;
+                            });
+
+                            expect(c.length).to.eql(3);
+                        });
+
+                });
+
+                it('should not determine support if srcset has no webp', () => {
+                    let webpRegex = /.+\.webp$/;
+                    let srcarr = i51.srcsetParse(i51.srcset);
+                    return i51._checkBrowserWebpSupport(srcarr)
+                        .then((arr) => {
+                            expect(i51._supportsWebp).to.be.a('undefined');
+                            expect(arr.length).to.eql(2);
+                        });
+
+                });
+
+                it('should handle srcset with no webp images included', () => {
+                    let webpRegex = /.+\.webp$/;
+                    let srcarr = i51.srcsetParse(i51.srcset);
+                    return i51._checkBrowserWebpSupport(srcarr)
+                        .then((arr) => {
+                            expect(arr.length).to.eql(2);
+                        });
+                });
+
+                it('should know if srcset has webp images', () => {
+                    expect(wp01._hasWebp).to.eql(true);
+                    expect(i51._hasWebp).to.eql(false);
+                    expect(i50._hasWebp).to.eql(false);
+                    expect(i49._hasWebp).to.eql(false);
+                });
+
+            });
+
+        });
+    </script>
+
+</body>
+
+</html>

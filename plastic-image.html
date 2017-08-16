@@ -852,8 +852,8 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                             // issue 23 - Edge does not reliably dispatch scroll events
                             let uaparser = new UAParser();
                             let uapResult = uaparser.getResult();
-                            if (uapResult && uapResult.browser && uapResult.browser.name == "Edge") {
-                                window.plasticImageIntersectionObserver.observer.POLL_INTERVAL = 300;
+                            if (uapResult && uapResult.browser && (uapResult.browser.name == "Edge" || uapResult.browser.name == "IE")) {
+                                window.plasticImageIntersectionObserver.observer.POLL_INTERVAL = 120;
                             }
                         }
                     }
@@ -911,12 +911,16 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                                 window.plasticImageWebp = {
                                     supports: result
                                 };
+                                // not used by element, but used by WCT tests
+                                this._supportsWebp = result;
                                 resolve(this._filterWebp(srcArray, result));
                             };
                             webpImg.onerror = () => {
                                 window.plasticImageWebp = {
                                     supports: false
                                 };
+                                // not used by element, but used by WCT tests
+                                this._supportsWebp = false;
                                 resolve(this._filterWebp(srcArray, false));
                             }
                             webpImg.src =
