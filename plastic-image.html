@@ -582,8 +582,10 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                         // a U+0077 LATIN SMALL LETTER W character
                         if (regexNonNegativeInteger.test(value) && (lastChar === "w")) {
 
+                            // plastic-map-info issue 34 - density is allowed with width
                             // If width and density are not both absent, then let error be yes.
-                            if (w || d) {
+                            // if (w || d) {
+                            if (w) {
                                 pError = true;
                             }
 
@@ -600,9 +602,11 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                             // a U+0078 LATIN SMALL LETTER X character
                         } else if (regexFloatingPoint.test(value) && (lastChar === "x")) {
 
+                            // plastic-map-info issue 34 - density is allowed with width and or height
                             // If width, density and future-compat-h are not all absent, then let error
                             // be yes.
-                            if (w || d || h) {
+                            // if (w || d || h) {
+                            if (d) {
                                 pError = true;
                             }
 
@@ -619,8 +623,10 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                             // a U+0068 LATIN SMALL LETTER H character
                         } else if (regexNonNegativeInteger.test(value) && (lastChar === "h")) {
 
+                            // plastic-map-info issue 34 - density is allowed with height
                             // If height and density are not both absent, then let error be yes.
-                            if (h || d) {
+                            // if (h || d) {
+                            if (h) {
                                 pError = true;
                             }
 
