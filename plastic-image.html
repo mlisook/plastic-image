@@ -856,11 +856,9 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                         };
                         if (polyfilled) {
                             // issue 23 - Edge does not reliably dispatch scroll events
-                            let uaparser = new UAParser();
-                            let uapResult = uaparser.getResult();
-                            if (uapResult && uapResult.browser && (uapResult.browser.name == "Edge" || uapResult.browser.name == "IE")) {
+                            // issue 36 - Safari iOS does not reliably get scroll events with iron-scroll-target
+                            //            At this point all pollyfilled browsers need polling :(
                                 window.plasticImageIntersectionObserver.observer.POLL_INTERVAL = 120;
-                            }
                         }
                     }
                     // observe this element
