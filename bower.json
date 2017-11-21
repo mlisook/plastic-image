@@ -2,7 +2,7 @@
   "name": "plastic-image",
   "description": "iron-image extension supporting srcset and lazy loading",
   "main": "plastic-image.html",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "license": "MIT",
   "keywords": [
     "polymer",
