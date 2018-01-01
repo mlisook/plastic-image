@@ -192,6 +192,13 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                         value: /.+\.webp$/i
                     },
                     /**
+                     * override default webp detection regex
+                     */
+                    webpRegex: {
+                        type: String,
+                        observer: "_webpRegexObserver"
+                    },
+                    /**
                      * Indicates that the srcset string has at least one webp image
                      * @private
                      */
@@ -204,7 +211,7 @@ the `fallbackSrc` / `fallback-src` attribute instead.
 
             static get observers() {
                 return [
-                    '_doImageSelectionObserver(fallbackSrc, srcset, delayLoad, _lazyLoadPending)',
+                    '_doImageSelectionObserver(fallbackSrc, srcset, delayLoad, _lazyLoadPending, _webpRegex)',
                     '_cleanupWillChange(fade, loaded, src)'
                 ]
             }
@@ -858,7 +865,7 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                             // issue 23 - Edge does not reliably dispatch scroll events
                             // issue 36 - Safari iOS does not reliably get scroll events with iron-scroll-target
                             //            At this point all pollyfilled browsers need polling :(
-                                window.plasticImageIntersectionObserver.observer.POLL_INTERVAL = 120;
+                            window.plasticImageIntersectionObserver.observer.POLL_INTERVAL = 120;
                         }
                     }
                     // observe this element
@@ -905,6 +912,7 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                     } else {
                         // if webp has previously been detected, use the prior detection
                         if (window.plasticImageWebp) {
+                            this._supportsWebp = window.plasticImageWebp.supports;
                             resolve(this._filterWebp(srcArray, window.plasticImageWebp.supports));
                         } else {
                             // support has not been previously detected so
@@ -948,6 +956,30 @@ the `fallbackSrc` / `fallback-src` attribute instead.
                 return srcArray.filter((srcitem) => {
                     return this._webpRegex.test(srcitem.url) === supports;
                 })
+            }
+            /**
+             * Observer for this.webpRegex which provides the element consumer
+             * api access to modify the webp detection regex. This function
+             * handle a change to webpRegex
+             * by applying the change to _webpRegex
+             */
+            _webpRegexObserver(n, o) {
+                if (n) {
+                    // webpRegex can be either a matching string, e.g.
+                    // "\.webp\?foo=bar" or it can be a full regex expression, e.g.
+                    // "/\.webp\?foo=bar/i" i.e. with the enclosing "/" and modifiers, if any.
+                    let regParts = n.match(/^\/(.*?)\/([gim]*)$/);
+                    if (regParts) {
+                        this._webpRegex = new RegExp(regParts[1], regParts[2]);
+                    } else {
+                        // if the string did not have delimiters
+                        // create a regex with just the pattern and ignore case
+                        this._webpRegex = new RegExp(n, "i");
+                    }
+                } else {
+                    // reset to default webp detection
+                    this._webpRegex = /.+\.webp$/i;
+                }
             }
         }
 
