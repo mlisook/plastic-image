@@ -59,7 +59,21 @@ the best fit webp image.  If the browser does not support webp, the control will
 
 Webp images are typically significantly smaller than JPG or PNG so it can represent a decrease in network traffic.
 
-There are no flags or attributes to enable this support.  Just include webp along with non webp images in the srcset to take advantage.  
+There are no flags to enable this support.  Just include webp along with non webp images in the srcset to take advantage.
+
+### How Webp Images are Detected in the srcset
+
+`plastic-image` checks for webp images using a regular expression. The default regex is `/\.webp$/i` (i.e. the url ends with `.webp`). This may not work for you if you are using url parameters or if for any other reason the url doesn't end with `.webp`.  You can modify the regex used to suit your url scheme by setting the `webpRegex` property: 
+```HTML
+<plastic-image id="wp01" webp-regex="wp=yes" lazy-load preload fade use-element-dim sizing="contain" ...
+```
+(matches `wp=yes` case insensitive anywhere in the url)
+
+You can supply just the matching string, as above, or the complete regex including modifiers such as:
+```HTML
+<plastic-image id="wp01" webp-regex="/[\?&]wp=yes/i" lazy-load preload fade use-element-dim sizing="contain" ...
+```
+(matches `?wp=yes` or `&wp=yes` case insensitive anywhere in the url)
 
 ### Example Webp
 
