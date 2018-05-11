@@ -4,13 +4,10 @@
 <head>
     <meta charset="utf-8">
     <title></title>
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-    <link rel="import" href="../../polymer/polymer-element.html">
-    <!-- <script src="../../test-fixture/test-fixture-mocha.js"></script> -->
-    <link rel="import" href="../../iron-test-helpers/iron-test-helpers.html">
-    <link rel="import" href="../plastic-image.html">
-    <script src="../../web-component-tester/browser.js"></script>
-    <script src="../../iron-test-helpers/mock-interactions.js"></script>
+    <script src="../../@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+    <script type="module" src="../../@polymer/polymer/polymer-element.js"></script>
+    <script type="module" src="../plastic-image.js"></script>
+    <script src="../../wct-browser-legacy/browser.js"></script>
     <script src="../../chai/chai.js"></script>
 
 </head>
@@ -50,123 +47,125 @@
         </template>
     </test-fixture>
 
-    <script>
-        describe('plastic-image webp detection', () => {
-            let testFixture1, findSrcsetEntry, i51, i50, i49, wp01;
-            // IE does not have array.find
-            if (Array.prototype && Array.prototype.find) {
-                findSrcsetEntry = (arr, url) => {
-                    return arr.find((item) => {
-                        return item.url == url;
-                    })
-                }
+    <script type="module">
+import '../../@polymer/polymer/polymer-element.js';
+import '../plastic-image.js';
+describe('plastic-image webp detection', () => {
+    let testFixture1, findSrcsetEntry, i51, i50, i49, wp01, wp02, wp03, wp04;
+    // IE does not have array.find
+    if (Array.prototype && Array.prototype.find) {
+        findSrcsetEntry = (arr, url) => {
+            return arr.find((item) => {
+                return item.url == url;
+            })
+        }
+    } else {
+        findSrcsetEntry = (arr, url) => {
+            let filtered = arr.filter((item) => {
+                return item.url == url;
+            });
+            if (filtered && filtered.length > 0) {
+                return filtered[0];
             } else {
-                findSrcsetEntry = (arr, url) => {
-                    let filtered = arr.filter((item) => {
-                        return item.url == url;
-                    });
-                    if (filtered && filtered.length > 0) {
-                        return filtered[0];
-                    } else {
-                        return undefined;
-                    }
-                }
+                return undefined;
             }
-            let selectedImgUrl = (el) => {
-                return el.bestMatchingImage(el.srcsetParse(el.srcset));
-            };
-            beforeEach(() => {
-                testFixture1 = fixture('webpFixture');
-                i51 = document.querySelector('#i51');
-                i50 = document.querySelector('#i50');
-                i49 = document.querySelector('#i49');
-                wp01 = document.querySelector('#wp01');
-                wp02 = document.querySelector('#wp02');
-                wp03 = document.querySelector('#wp03');
-                wp04 = document.querySelector('#wp04');
-                wp01.assignImgSrc();
-                wp02.assignImgSrc();
-                wp03.assignImgSrc();
-                wp04.assignImgSrc();
-                i51.assignImgSrc();
-                i50.assignImgSrc();
-                i49.assignImgSrc();
-            });
-            context('feature detection', () => {
+        }
+    }
+    let selectedImgUrl = (el) => {
+        return el.bestMatchingImage(el.srcsetParse(el.srcset));
+    };
+    beforeEach(() => {
+        testFixture1 = fixture('webpFixture');
+        i51 = document.querySelector('#i51');
+        i50 = document.querySelector('#i50');
+        i49 = document.querySelector('#i49');
+        wp01 = document.querySelector('#wp01');
+        wp02 = document.querySelector('#wp02');
+        wp03 = document.querySelector('#wp03');
+        wp04 = document.querySelector('#wp04');
+        wp01.assignImgSrc();
+        wp02.assignImgSrc();
+        wp03.assignImgSrc();
+        wp04.assignImgSrc();
+        i51.assignImgSrc();
+        i50.assignImgSrc();
+        i49.assignImgSrc();
+    });
+    context('feature detection', () => {
 
-                it('should determine support if srcset has webp', () => {
-                    let webpRegex = /.+\.webp$/;
-                    wp01.assignImgSrc();
-                    return wp01._checkBrowserWebpSupport(wp01.srcsetParse(wp01.srcset))
-                        .then((arr) => {
-                            expect(wp01._supportsWebp).to.not.be.a('undefined');
-                            expect(arr.length).to.eql(3);
-                            let c = arr.filter((item) => {
-                                return webpRegex.test(item.url) == wp01._supportsWebp;
-                            });
+        it('should determine support if srcset has webp', () => {
+            let webpRegex = /.+\.webp$/;
+            wp01.assignImgSrc();
+            return wp01._checkBrowserWebpSupport(wp01.srcsetParse(wp01.srcset))
+                .then((arr) => {
+                    expect(wp01._supportsWebp).to.not.be.a('undefined');
+                    expect(arr.length).to.eql(3);
+                    let c = arr.filter((item) => {
+                        return webpRegex.test(item.url) == wp01._supportsWebp;
+                    });
 
-                            expect(c.length).to.eql(3);
-                        });
-
+                    expect(c.length).to.eql(3);
                 });
-
-                it('should determine support if srcset has webp and custom regex', () => {
-                    let webpRegex = wp02._webpRegex;
-                    wp02.assignImgSrc();
-                    return wp02._checkBrowserWebpSupport(wp02.srcsetParse(wp02.srcset))
-                        .then((arr) => {
-                            expect(wp02._supportsWebp).to.not.be.a('undefined');
-                            expect(arr.length).to.eql(3);
-                            let c = arr.filter((item) => {
-                                return webpRegex.test(item.url) == wp02._supportsWebp;
-                            });
-
-                            expect(c.length).to.eql(3);
-                        });
-
-                });
-
-                it('should not determine support if srcset has no webp', () => {
-                    let webpRegex = /.+\.webp$/;
-                    let srcarr = i51.srcsetParse(i51.srcset);
-                    return i51._checkBrowserWebpSupport(srcarr)
-                        .then((arr) => {
-                            expect(i51._supportsWebp).to.be.a('undefined');
-                            expect(arr.length).to.eql(2);
-                        });
-
-                });
-
-                it('should handle srcset with no webp images included', () => {
-                    let webpRegex = /.+\.webp$/;
-                    let srcarr = i51.srcsetParse(i51.srcset);
-                    return i51._checkBrowserWebpSupport(srcarr)
-                        .then((arr) => {
-                            expect(arr.length).to.eql(2);
-                        });
-                });
-
-                it('should know if srcset has webp images', () => {
-                    expect(wp01._hasWebp).to.eql(true);
-                    expect(wp02._hasWebp).to.eql(true);
-                    expect(wp03._hasWebp).to.eql(true);
-                    expect(wp04._hasWebp).to.eql(false);
-                    expect(i51._hasWebp).to.eql(false);
-                    expect(i50._hasWebp).to.eql(false);
-                    expect(i49._hasWebp).to.eql(false);
-                });
-
-                it('should allow change to webp regex', () => {
-                    expect(wp04._hasWebp).to.eql(false);
-                    wp04.webpRegex = "foo=";
-                    wp04.assignImgSrc();
-                    expect(wp04._hasWebp).to.eql(true);
-                })
-
-            });
 
         });
-    </script>
+
+        it('should determine support if srcset has webp and custom regex', () => {
+            let webpRegex = wp02._webpRegex;
+            wp02.assignImgSrc();
+            return wp02._checkBrowserWebpSupport(wp02.srcsetParse(wp02.srcset))
+                .then((arr) => {
+                    expect(wp02._supportsWebp).to.not.be.a('undefined');
+                    expect(arr.length).to.eql(3);
+                    let c = arr.filter((item) => {
+                        return webpRegex.test(item.url) == wp02._supportsWebp;
+                    });
+
+                    expect(c.length).to.eql(3);
+                });
+
+        });
+
+        it('should not determine support if srcset has no webp', () => {
+            let webpRegex = /.+\.webp$/;
+            let srcarr = i51.srcsetParse(i51.srcset);
+            return i51._checkBrowserWebpSupport(srcarr)
+                .then((arr) => {
+                    expect(i51._supportsWebp).to.be.a('undefined');
+                    expect(arr.length).to.eql(2);
+                });
+
+        });
+
+        it('should handle srcset with no webp images included', () => {
+            let webpRegex = /.+\.webp$/;
+            let srcarr = i51.srcsetParse(i51.srcset);
+            return i51._checkBrowserWebpSupport(srcarr)
+                .then((arr) => {
+                    expect(arr.length).to.eql(2);
+                });
+        });
+
+        it('should know if srcset has webp images', () => {
+            expect(wp01._hasWebp).to.eql(true);
+            expect(wp02._hasWebp).to.eql(true);
+            expect(wp03._hasWebp).to.eql(true);
+            expect(wp04._hasWebp).to.eql(false);
+            expect(i51._hasWebp).to.eql(false);
+            expect(i50._hasWebp).to.eql(false);
+            expect(i49._hasWebp).to.eql(false);
+        });
+
+        it('should allow change to webp regex', () => {
+            expect(wp04._hasWebp).to.eql(false);
+            wp04.webpRegex = "foo=";
+            wp04.assignImgSrc();
+            expect(wp04._hasWebp).to.eql(true);
+        })
+
+    });
+
+});
+</script>
 
 </body>
 
