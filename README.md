@@ -1,6 +1,6 @@
 # \<plastic-image\>
 
-A Polymer 2.0 element which adds extra plasticity to `iron-image` with support for **srcset**,
+A Polymer 3.0 element which adds extra plasticity to `iron-image` with support for **srcset**,
 **lazy loading** and **webp**.
 
 `plastic-image` extends `iron-image` by adding a `srcset` attribute for client side image
@@ -9,6 +9,17 @@ the element is showing in the viewport. Finally, it allows you to serve (typical
 `webp` images to browsers that support webp.
 
 Please review the api docs for `iron-image` as this element is a subclass of `iron-image`.
+
+## Available Versions
+
+**1.0.14** is the latest version for Polymer **2.0** and can be installed via **bower**:
+```
+bower install --save plastic-image#1.0.14
+```
+***3.0.0*** is the version for Polymer **3.0** and can be installed via **npm**:
+```
+npm install --save plastic-image
+```
 
 ## plastic-image srcset 
 
@@ -86,7 +97,15 @@ You can supply just the matching string, as above, or the complete regex includi
 
 ## Install the Component
 
-`bower install --save plastic-image`
+For Polymer 3.0:
+```
+npm install --save plastic-image
+```
+
+For Polymer 2.0:
+```
+bower install --save plastic-image#1.0.14
+```
 
 ## Basic Use Examples
 Use the control as you would an `iron-image` but with the srcset.
@@ -155,11 +174,17 @@ fetch('imageDetail/47561').then((response) => {
 ```
 
 ## Polymer Build / polymer.json
-The element may automaticall loads 2 polyfill scripts to support IntersectionObserver on browsers where native support is not available. These are not detected by the Polymer build analyzer. If you are using `polymer build` you should modify the `polymer.json` file to include these scripts in your build by adding them to the `extraDependencies` array:
+The element may automaticall loads a polyfill script to support IntersectionObserver on browsers where native support is not available. The script is not detected by the Polymer build analyzer. If you are using `polymer build` you should modify the `polymer.json` file to include the script in your build by adding them to the `extraDependencies` array:
+```Javascript
+"extraDependencies": [
+    "node_modules/plastic-image/intersection-observer.js",
+    ...
+  ]
+  ```
+or, on Polymer 2.0:
 ```Javascript
 "extraDependencies": [
     "bower_components/plastic-image/intersection-observer.js",
-    "bower_components/ua-parser-js/dist/ua-parser.min.js",
     ...
   ]
   ```

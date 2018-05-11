@@ -1,0 +1,35 @@
+{
+  "name": "plastic-image",
+  "flat": true,
+  "version": "3.0.0",
+  "description": "iron-image extension supporting srcset and lazy loading",
+  "keywords": [
+    "polymer",
+    "polymer 3.0",
+    "image",
+    "iron-image",
+    "srcset",
+    "lazy",
+    "lazy-load",
+    "3.0",
+    "responsive",
+    "custom-element",
+    "web-components",
+    "webp"
+  ],
+  "main": "plastic-image.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mlisook/plastic-image.git"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@polymer/polymer": "^3.0.0",
+    "@polymer/iron-image": "^3.0.0-pre.19"
+  },
+  "devDependencies": {
+    "@polymer/iron-demo-helpers": "^3.0.0-pre.12",
+    "@webcomponents/webcomponentsjs": "^2.0.0",
+    "wct-browser-legacy": "^1.0.0"
+  }
+}
