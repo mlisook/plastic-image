@@ -19,12 +19,14 @@
     "webp"
   ],
   "dependencies": {
-    "polymer": "Polymer/polymer#^2.0.0",
+    "polymer": "Polymer/polymer#^2.2.1",
     "iron-image": "PolymerElements/iron-image#^2.1.1",
     "ua-parser-js": "^0.7.14"
   },
   "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#1 - 2",
     "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^2.0.0",
+    "paper-styles": "PolymerElements/paper-styles#1 - 2",
     "web-component-tester": "Polymer/web-component-tester#^6.0.0",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0",
     "iron-test-helpers": "PolymerElements/iron-test-helpers#^2.0.0"
