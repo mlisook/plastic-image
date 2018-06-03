@@ -1,7 +1,7 @@
 {
   "name": "plastic-image",
   "flat": true,
-  "version": "3.0.0",
+  "version": "3.0.2",
   "description": "iron-image extension supporting srcset and lazy loading",
   "keywords": [
     "polymer",
