@@ -105,6 +105,8 @@ class PlasticImage extends customElements.get('iron-image') {
         }
         return window.PlasticImageTemplate;
     }
+    static get importMeta() { return import.meta; }
+
     static get properties() {
         return {
             /**
