@@ -1,5 +1,8 @@
 # \<plastic-image\>
 
+[![Published on Vaadin  Directory](https://img.shields.io/badge/Vaadin%20Directory-published-00b4f0.svg)](https://vaadin.com/directory/component/mlisookplastic-image)
+[![Stars on Vaadin Directory](https://img.shields.io/vaadin-directory/star/mlisookplastic-image.svg)](https://vaadin.com/directory/component/mlisookplastic-image)
+
 A Polymer 3.0 element which adds extra plasticity to `iron-image` with support for **srcset**,
 **lazy loading** and **webp**.
 
